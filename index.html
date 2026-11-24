@@ -72,7 +72,7 @@ canvas{display:block;width:100%;height:100%}
 <div class="overlay" id="start-screen">
 <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
 <div class="logo">⚡ SWITCH <span>PERFUME</span></div>
-<div class="sub">با ضربه زدن بین دیوارهای طلایی جابه‌جا شو، <b>شیشه‌های عطر ماهان</b> را شکار کن و تا <b>۳۰٪ کد تخفیف</b> بگیر!</div>
+<div class="sub">با ضربه زدن بین دیوارهای طلایی جابه‌جا شو، <b>شیشه‌های عطر مدادی و جیبی ماهان</b> را شکار کن و تا <b>۳۰٪ کد تخفیف</b> بگیر!</div>
 <input type="text" id="player-name-input" class="name-input" placeholder="نام یا آیدی اینستاگرامت را بنویس (اختیاری)" maxlength="22">
 <div class="card">
 <div class="card-title"><span>🏆 برترین رکوردهای چالش</span><span id="my-rank" style="color:#f3e5ab;font-size:11px"></span></div>
@@ -412,6 +412,18 @@ function isSafeGreenSpot(gx, gy, size) {
     return true;
 }
 
+// پالت رنگ واقعی عطرهای ماهان پرفیوم مطابق تصویر ارسالی
+const PERFUME_VARIANTS = [
+    // شیشه‌های ۲۰ میل مدادی بلند (باریک و قدبلند با درب نقره‌ای)
+    { isPen: true,  liquidTop: "#fef08a", liquidBot: "#eab308", capBlack: false, glow: "#facc15" }, // زرد طلایی مدادی
+    { isPen: true,  liquidTop: "#bae6fd", liquidBot: "#0284c7", capBlack: false, glow: "#38bdf8" }, // آبی یخی مدادی
+    { isPen: true,  liquidTop: "#fed7aa", liquidBot: "#ea580c", capBlack: false, glow: "#fb923c" }, // هلویی/کهربایی مدادی
+    // شیشه‌های استوانه‌ای کوچک (جیبی کوتاه‌تر با درب نقره‌ای یا مشکی)
+    { isPen: false, liquidTop: "#3b82f6", liquidBot: "#1e3a8a", capBlack: false, glow: "#60a5fa" }, // آبی سلطنتی کوچک
+    { isPen: false, liquidTop: "#fdba74", liquidBot: "#c2410c", capBlack: true,  glow: "#f97316" }, // هلویی درب مشکی کوچک
+    { isPen: false, liquidTop: "#fde047", liquidBot: "#ca8a04", capBlack: false, glow: "#fde047" }  // طلایی کهربایی کوچک
+];
+
 function spawnNextWave() {
     stepCount++;
     const leftEdge = WALL;
@@ -431,13 +443,14 @@ function spawnNextWave() {
     if (fromLeft) bars.push({ x: leftEdge, y: barY, w: barW, h: barH, passed: false });
     else bars.push({ x: rightEdge - barW, y: barY, w: barW, h: barH, passed: false });
 
-    // قرار دادن شیشه‌های عطر اختصاصی ماهان پرفیوم در مسیر پرش (به‌جای ستاره)
+    // قرار دادن شیشه‌های مدادی و کوچک ماهان پرفیوم در مسیر پرش
     if (stepCount % 2 === 0) {
+        const variant = PERFUME_VARIANTS[Math.floor(Math.random() * PERFUME_VARIANTS.length)];
         perfumesList.push({
             x: W / 2,
             y: -98,
             taken: false,
-            isBlueCap: (stepCount % 4 === 0) // یکی در میان شیشه درب آبی یا درب نقره‌ای
+            variant: variant
         });
     }
 
@@ -567,85 +580,86 @@ function copyCoupon() {
     toast("کد تخفیف " + code + " کپی شد! ✔");
 }
 
-// رسم شیشه عطر استوانه‌ای با لیبل سفید و نشان طلایی m ماهان پرفیوم (به‌جای ستاره)
-function drawMahanPerfumeItem(x, y, isBlueCap, timeNow) {
+// رسم شیشه عطر ۲۰ میل مدادی (باریک و بلند) و شیشه استوانه‌ای کوچک ماهان پرفیوم
+function drawMahanPerfumeItem(x, y, v, timeNow) {
     ctx.save();
     ctx.translate(x, y);
-    // چرخش و شناوری ملایم شیشه در هوا
     const hoverY = Math.sin(timeNow * 0.006) * 2.5;
     const tilt = Math.sin(timeNow * 0.004) * 0.12;
     ctx.translate(0, hoverY);
     ctx.rotate(tilt);
 
-    const bw = 22;
-    const bh = 32;
-    const capH = 14;
+    // ابعاد دقیق: شیشه مدادی باریک‌تر و کشیده‌تر، شیشه کوچک کوتاه‌تر و تپل‌تر
+    const bw = v.isPen ? 14 : 21;
+    const bh = v.isPen ? 38 : 26;
+    const capH = v.isPen ? 12 : 12;
 
-    // هاله نورانی پشت شیشه عطر
-    ctx.shadowColor = isBlueCap ? "#38bdf8" : "#ffd700";
-    ctx.shadowBlur = 14;
+    // هاله نورانی هم‌رنگ اسانس عطر
+    ctx.shadowColor = v.glow;
+    ctx.shadowBlur = 13;
 
     // ۱. بدنه شیشه‌ای عطر
-    const glassGrad = ctx.createLinearGradient(-bw / 2, 0, bw / 2, 0);
-    if (isBlueCap) {
-        glassGrad.addColorStop(0, "#1e1b4b");
-        glassGrad.addColorStop(0.45, "#5b21b6");
-        glassGrad.addColorStop(1, "#0f172a");
-    } else {
-        glassGrad.addColorStop(0, "#18181b");
-        glassGrad.addColorStop(0.45, "#52525b");
-        glassGrad.addColorStop(1, "#09090b");
-    }
+    const glassGrad = ctx.createLinearGradient(0, -bh / 2 + 5, 0, bh / 2 + 5);
+    glassGrad.addColorStop(0, v.liquidTop);
+    glassGrad.addColorStop(1, v.liquidBot);
+
     ctx.fillStyle = glassGrad;
-    ctx.strokeStyle = "rgba(255,255,255,0.6)";
-    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = 1.1;
     ctx.beginPath();
-    ctx.roundRect(-bw / 2, -bh / 2 + 5, bw, bh, 3.5);
+    ctx.roundRect(-bw / 2, -bh / 2 + 5, bw, bh, v.isPen ? 2.5 : 3.5);
     ctx.fill();
     ctx.stroke();
 
-    // ۲. درب متالیک نقره‌ای یا آبی رویال
+    // ضخامت شیشه در ته بطری (مطابق عکس)
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.fillRect(-bw / 2 + 1, bh / 2 + 1, bw - 2, 3.5);
+
+    // ۲. درب متالیک نقره‌ای یا مشکی براق
     const capGrad = ctx.createLinearGradient(-bw / 2, 0, bw / 2, 0);
-    if (isBlueCap) {
-        capGrad.addColorStop(0, "#1e3a8a");
-        capGrad.addColorStop(0.4, "#3b82f6");
-        capGrad.addColorStop(1, "#172554");
+    if (v.capBlack) {
+        capGrad.addColorStop(0, "#09090b");
+        capGrad.addColorStop(0.4, "#3f3f46");
+        capGrad.addColorStop(1, "#000000");
     } else {
         capGrad.addColorStop(0, "#71717a");
-        capGrad.addColorStop(0.4, "#ffffff");
+        capGrad.addColorStop(0.38, "#ffffff");
+        capGrad.addColorStop(0.75, "#a1a1aa");
         capGrad.addColorStop(1, "#52525b");
     }
     ctx.fillStyle = capGrad;
     ctx.beginPath();
-    ctx.roundRect(-bw / 2, -bh / 2 - capH + 5, bw, capH, [2.5, 2.5, 0, 0]);
+    ctx.roundRect(-bw / 2, -bh / 2 - capH + 5, bw, capH, [2, 2, 0, 0]);
     ctx.fill();
 
     // ۳. لیبل سفید اختصاصی ماهان پرفیوم روی شیشه
     ctx.shadowBlur = 0;
-    const lw = bw - 5;
-    const lh = bh - 10;
+    const lw = bw - 3.5;
+    const lh = v.isPen ? 19 : 16;
+    const ly = v.isPen ? (-bh / 2 + 16) : (-bh / 2 + 9);
+
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.roundRect(-lw / 2, -bh / 2 + 9, lw, lh, 1.5);
+    ctx.roundRect(-lw / 2, ly, lw, lh, 1.5);
     ctx.fill();
 
-    // قوس طلایی بالای m
+    // قوس طلایی بالای حرف m
     ctx.strokeStyle = "#d4af37";
-    ctx.lineWidth = 1.4;
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.arc(0, -bh / 2 + 18, 4.2, Math.PI * 0.9, Math.PI * 2.1);
+    ctx.arc(0, ly + 7, v.isPen ? 3.2 : 4, Math.PI * 0.9, Math.PI * 2.1);
     ctx.stroke();
 
     // حرف m مشکی
     ctx.fillStyle = "#09090b";
-    ctx.font = "italic 900 10px Georgia";
+    ctx.font = v.isPen ? "italic 900 8px Georgia" : "italic 900 9.5px Georgia";
     ctx.textAlign = "center";
-    ctx.fillText("m", 0, -bh / 2 + 20.5);
+    ctx.fillText("m", 0, ly + 9.2);
 
-    // متن ریز MAHAN
+    // متن ریز MAHAN زیر حرف m
     ctx.fillStyle = "#18181b";
-    ctx.font = "bold 3.8px sans-serif";
-    ctx.fillText("MAHAN", 0, -bh / 2 + 25.5);
+    ctx.font = "bold 3px sans-serif";
+    ctx.fillText("MAHAN", 0, ly + 13.5);
 
     ctx.restore();
 }
@@ -675,7 +689,6 @@ function drawBorderedRect(x, y, w, h, fillCol, strokeCol, lineW) {
 // رسم توپ بازی با لوگوی دایره‌ای واقعی ماهان پرفیوم
 function drawLogoBall(x, y, r, sk) {
     ctx.save();
-    // هاله نورانی دور لوگو
     ctx.shadowColor = sk.glow;
     ctx.shadowBlur = 16;
 
@@ -692,14 +705,12 @@ function drawLogoBall(x, y, r, sk) {
         ctx.drawImage(logoImg, x - r, y - r, r * 2, r * 2);
         ctx.restore();
     } else {
-        // حالت جایگزین تا لحظه لود شدن عکس
         ctx.fillStyle = "#ffd700";
         ctx.font = "italic 900 16px Georgia";
         ctx.textAlign = "center";
         ctx.fillText("m", x, y + 5);
     }
 
-    // حلقه طلایی/رنگی دور لوگو
     ctx.strokeStyle = sk.glow;
     ctx.lineWidth = 2.2;
     ctx.beginPath();
@@ -836,7 +847,7 @@ function frame(now) {
             if (g.y > H + 60) greens.splice(i, 1);
         }
 
-        // برخورد لوگوی ماهان پرفیوم با شیشه‌های عطر در مسیر
+        // برخورد لوگوی ماهان پرفیوم با شیشه‌های مدادی و کوچک
         for (let i = perfumesList.length - 1; i >= 0; i--) {
             const p = perfumesList[i];
             p.y += dyStep;
@@ -849,7 +860,7 @@ function frame(now) {
                     score += 1;
                     document.getElementById("hud-best").innerText = Math.max(best, score);
                     beep(920, .09, "sine", 0.12);
-                    spawnScatter(p.x, p.y, p.isBlueCap ? "#38bdf8" : "#ffd700", 12, 110);
+                    spawnScatter(p.x, p.y, p.variant.glow, 12, 110);
                     addScorePopup(p.x, p.y - 10, "+1 🧴");
                 }
             }
@@ -874,10 +885,10 @@ function frame(now) {
         drawBorderedRect(g.x - half, g.y - half, g.size, g.size, "#18181b", "#ef4444", 3);
     }
 
-    // نمایش شیشه‌های عطر ماهان پرفیوم در مسیر بازی
+    // نمایش شیشه‌های مدادی و کوچک ماهان پرفیوم در مسیر
     for (let i = 0; i < perfumesList.length; i++) {
         if (!perfumesList[i].taken) {
-            drawMahanPerfumeItem(perfumesList[i].x, perfumesList[i].y, perfumesList[i].isBlueCap, now);
+            drawMahanPerfumeItem(perfumesList[i].x, perfumesList[i].y, perfumesList[i].variant, now);
         }
     }
 
