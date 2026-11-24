@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>چالش طلایی ماهان پرفیوم</title>
+    <title>چالش شکار عطر | ماهان پرفیوم</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap');
 
@@ -32,14 +32,14 @@
             width: 100%;
             max-width: 450px;
             height: 100%;
-            background: radial-gradient(circle at 50% 20%, #2b210a 0%, #090909 75%);
+            background: radial-gradient(circle at 50% 20%, #2b210a 0%, #080808 75%);
             border-left: 1px solid #d4af3744;
             border-right: 1px solid #d4af3744;
             overflow: hidden;
             transition: transform 0.05s;
         }
 
-        /* هدر امتیاز، زمان و کمبو */
+        /* هدر امتیاز، زمان و رکورد */
         #hud {
             position: absolute;
             top: 14px;
@@ -113,7 +113,7 @@
         .overlay {
             position: absolute;
             inset: 0;
-            background: rgba(8, 8, 8, 0.93);
+            background: rgba(8, 8, 8, 0.94);
             backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
@@ -128,48 +128,37 @@
             display: none !important;
         }
 
-        /* لوگوی دایره‌ای مشکی و طلایی ماهان پرفیوم */
-        .brand-logo {
-            width: 96px;
-            height: 96px;
+        /* تصویر لوگوی واقعی ماهان پرفیوم */
+        .brand-logo-img {
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
-            border: 2.5px solid #ffd700;
-            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 16px;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-        }
-
-        .brand-logo span:first-child {
-            color: #ffd700;
-            font-weight: 900;
-            font-size: 16px;
-            letter-spacing: 1px;
-        }
-
-        .brand-logo span:last-child {
-            color: #ffffff;
-            font-size: 9px;
-            letter-spacing: 2.5px;
-            margin-top: 2px;
+            object-fit: cover;
+            margin-bottom: 12px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.45);
+            border: 2px solid #ffd700;
         }
 
         h1 {
             color: #ffd700;
-            font-size: 25px;
+            font-size: 23px;
             font-weight: 900;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .brand-slogan {
+            color: #f3e5ab;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
         p {
             color: #cccccc;
-            font-size: 14px;
+            font-size: 13.5px;
             line-height: 1.7;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .rules-box {
@@ -178,7 +167,7 @@
             border-radius: 16px;
             padding: 12px;
             width: 100%;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             font-size: 12px;
             color: #f5f5f5;
             display: grid;
@@ -187,8 +176,8 @@
         }
 
         .rule-item {
-            background: rgba(0,0,0,0.4);
-            padding: 6px;
+            background: rgba(0,0,0,0.45);
+            padding: 7px;
             border-radius: 8px;
         }
 
@@ -285,16 +274,14 @@
 
     <!-- صفحه شروع -->
     <div id="start-screen" class="overlay">
-        <div class="brand-logo">
-            <span>MAHAN</span>
-            <span>PERFUME</span>
-        </div>
-        <h1>شکار اکسیر طلایی</h1>
-        <p>شیشه‌های عطر را بدون خطا بگیر تا وارد حالت <b>تب طلایی (امتیاز ۲ برابر)</b> شوی و کد تخفیف ویژه بگیری!</p>
+        <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
+        <h1>شکار عطرهای ماهان پرفیوم</h1>
+        <div class="brand-slogan">🌙 عطر شما امضای شماست 🌙</div>
+        <p>شیشه‌های عطر را بدون خطا بگیر تا وارد حالت <b>تب طلایی (امتیاز ۲ برابر)</b> شوی و کد تخفیف اختصاصی بگیری!</p>
         
         <div class="rules-box">
-            <div class="rule-item">🧴 عطر کلاسیک: <b>+۱۰</b></div>
-            <div class="rule-item">✨ اکسیر ویژه: <b>+۳۰</b></div>
+            <div class="rule-item">🩶 شیشه درب نقره‌ای: <b>+۱۰</b></div>
+            <div class="rule-item">💙 شیشه درب آبی ویژه: <b>+۳۰</b></div>
             <div class="rule-item">⏳ ساعت شنی: <b>+۳ ثانیه</b></div>
             <div class="rule-item">💣 بمب دودزا: <b>-۲۵ امتیاز</b></div>
         </div>
@@ -304,10 +291,7 @@
 
     <!-- صفحه پایان بازی -->
     <div id="end-screen" class="overlay hidden">
-        <div class="brand-logo">
-            <span>MAHAN</span>
-            <span>PERFUME</span>
-        </div>
+        <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
         <h1 id="end-title">فوق‌العاده بود!</h1>
         <p style="margin-bottom: 4px;">امتیاز شما: <b id="final-score" style="color:#ffd700; font-size:22px;">0</b></p>
         <div class="best-score-tag">بهترین رکورد شما: <span id="end-best-score">0</span></div>
@@ -318,19 +302,16 @@
             <button class="copy-btn" onclick="copyCoupon()">کپی کردن کد تخفیف</button>
         </div>
 
-        <a id="shop-link" href="https://instagram.com" target="_blank" class="btn">ورود به پیج و استفاده از کد</a>
+        <a id="shop-link" href="https://instagram.com/mahan___perfume" target="_blank" class="btn">ورود به پیج و استفاده از کد</a>
         <button class="btn btn-outline" onclick="startGame()">بازی مجدد (شکستن رکورد)</button>
     </div>
 
     <!-- صفحه انقضای کمپین -->
     <div id="expired-screen" class="overlay hidden">
-        <div class="brand-logo">
-            <span>MAHAN</span>
-            <span>PERFUME</span>
-        </div>
+        <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
         <h1>مهلت جشنواره تمام شد!</h1>
         <p>این چالش به پایان رسیده است. برای شرکت در چالش‌های بعدی، پیج ما را دنبال کنید.</p>
-        <a id="expired-shop-link" href="https://instagram.com" target="_blank" class="btn">ورود به پیج اینستاگرام</a>
+        <a id="expired-shop-link" href="https://instagram.com/mahan___perfume" target="_blank" class="btn">ورود به پیج اینستاگرام</a>
     </div>
 </div>
 
@@ -340,7 +321,7 @@
     // ==========================================
     const CONFIG = {
         brandName: "ماهان پرفیوم",
-        instagramUrl: "https://instagram.com", // آدرس پیج اینستاگرامت را اینجا بگذار
+        instagramUrl: "https://instagram.com/mahan___perfume",
         gameDuration: 30,
         expiryDate: "2027-12-30",
         
@@ -351,7 +332,6 @@
         ]
     };
 
-    // بررسی تاریخ انقضا
     if (new Date() > new Date(CONFIG.expiryDate)) {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('expired-screen').classList.remove('hidden');
@@ -360,7 +340,13 @@
 
     document.getElementById('shop-link').href = CONFIG.instagramUrl;
 
-    // سیستم تولید افکت صوتی بدون نیاز به فایل خارجی
+    // بارگذاری تصویر لوگو برای نمایش روی سبد بازی
+    const logoImg = new Image();
+    logoImg.src = "logo.png";
+    let logoLoaded = false;
+    logoImg.onload = () => { logoLoaded = true; };
+
+    // سیستم افکت صوتی
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
@@ -377,7 +363,6 @@
 
         if (type === 'catch') {
             osc.type = 'sine';
-            // با بالا رفتن کمبو، صدای زنگوله زیرتر و هیجانی‌تر می‌شود
             const baseFreq = 520 + Math.min(combo * 45, 450);
             osc.frequency.setValueAtTime(baseFreq, now);
             osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.12);
@@ -434,11 +419,11 @@
     let isFever = false;
 
     const player = {
-        w: 90,
-        h: 58,
-        x: width / 2 - 45,
-        y: height - 95,
-        targetX: width / 2 - 45
+        w: 94,
+        h: 64,
+        x: width / 2 - 47,
+        y: height - 100,
+        targetX: width / 2 - 47
     };
 
     function handleInput(clientX) {
@@ -466,10 +451,10 @@
     });
 
     const itemTypes = [
-        { type: 'perfume', emoji: "🧴", points: 10, speed: 4.8, weight: 58 },
-        { type: 'elixir',  emoji: "✨", points: 30, speed: 6.5, weight: 14 },
-        { type: 'time',    emoji: "⏳", points: 5,  speed: 6.0, weight: 8, addTime: 3 },
-        { type: 'bomb',    emoji: "💣", points: -25, speed: 5.8, weight: 20 }
+        { type: 'silver_bottle', points: 10, speed: 4.8, weight: 58 }, // شیشه عطر درب نقره‌ای ماهان پرفیوم
+        { type: 'blue_bottle',   points: 30, speed: 6.4, weight: 15 }, // شیشه عطر درب آبی خاص ماهان پرفیوم
+        { type: 'time',          points: 5,  speed: 6.0, weight: 8, addTime: 3 },
+        { type: 'bomb',          points: -25, speed: 5.8, weight: 19 }
     ];
 
     function spawnItem() {
@@ -484,20 +469,104 @@
             }
         }
 
-        // در ۵ ثانیه آخر سرعت بازی هیجانی‌تر می‌شود
         const speedBoost = timeLeft <= 5 ? 2.2 : 0;
 
         items.push({
             x: Math.random() * (width - 60) + 30,
-            y: -40,
-            size: 38,
+            y: -45,
             speed: selected.speed + speedBoost + (Math.random() * 1.4),
             type: selected.type,
-            emoji: selected.emoji,
             points: selected.points,
             addTime: selected.addTime || 0,
-            wobble: Math.random() * Math.PI * 2
+            wobble: Math.random() * Math.PI * 2,
+            rotation: (Math.random() - 0.5) * 0.3
         });
+    }
+
+    // تابع اختصاصی رسم شیشه عطر استوانه‌ای ماهان پرفیوم (مطابق عکس ارسالی)
+    function drawMahanBottle(x, y, isBlueCap, angle) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+
+        const bw = 26;
+        const bh = 38;
+        const capH = 18;
+
+        if (isBlueCap) {
+            ctx.shadowColor = "#38bdf8";
+            ctx.shadowBlur = 16;
+        }
+
+        // ۱. بدنه شیشه‌ای استوانه‌ای
+        const glassGrad = ctx.createLinearGradient(-bw/2, 0, bw/2, 0);
+        if (isBlueCap) {
+            glassGrad.addColorStop(0, "#1e1b4b");
+            glassGrad.addColorStop(0.4, "#4c1d95");
+            glassGrad.addColorStop(1, "#0f172a");
+        } else {
+            glassGrad.addColorStop(0, "#18181b");
+            glassGrad.addColorStop(0.4, "#3f3f46");
+            glassGrad.addColorStop(1, "#09090b");
+        }
+        ctx.fillStyle = glassGrad;
+        ctx.strokeStyle = "rgba(255,255,255,0.45)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(-bw/2, -bh/2 + 6, bw, bh, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // ضخامت شیشه در کف بطری
+        ctx.fillStyle = "rgba(255,255,255,0.28)";
+        ctx.fillRect(-bw/2 + 1, bh/2 + 1, bw - 2, 4);
+
+        // ۲. درب استوانه‌ای متالیک
+        const capGrad = ctx.createLinearGradient(-bw/2, 0, bw/2, 0);
+        if (isBlueCap) {
+            capGrad.addColorStop(0, "#1e3a8a");
+            capGrad.addColorStop(0.35, "#3b82f6");
+            capGrad.addColorStop(0.7, "#1d4ed8");
+            capGrad.addColorStop(1, "#172554");
+        } else {
+            capGrad.addColorStop(0, "#71717a");
+            capGrad.addColorStop(0.35, "#ffffff");
+            capGrad.addColorStop(0.7, "#a1a1aa");
+            capGrad.addColorStop(1, "#52525b");
+        }
+        ctx.fillStyle = capGrad;
+        ctx.beginPath();
+        ctx.roundRect(-bw/2, -bh/2 - capH + 6, bw, capH, [3, 3, 0, 0]);
+        ctx.fill();
+
+        // ۳. لیبل سفید اختصاصی روی شیشه با نشان طلایی و حرف m
+        ctx.shadowBlur = 0;
+        const lw = bw - 6;
+        const lh = bh - 12;
+        ctx.fillStyle = "#f8fafc";
+        ctx.beginPath();
+        ctx.roundRect(-lw/2, -bh/2 + 11, lw, lh, 2);
+        ctx.fill();
+
+        // قوس طلایی بالای m
+        ctx.strokeStyle = "#d4af37";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, -bh/2 + 21, 5, Math.PI * 0.9, Math.PI * 2.1);
+        ctx.stroke();
+
+        // حرف m مشکی وسط لیبل
+        ctx.fillStyle = "#09090b";
+        ctx.font = "italic 900 11px Georgia";
+        ctx.textAlign = "center";
+        ctx.fillText("m", 0, -bh/2 + 24);
+
+        // خط ریز MAHAN زیر حرف m
+        ctx.fillStyle = "#18181b";
+        ctx.font = "bold 4px sans-serif";
+        ctx.fillText("MAHAN", 0, -bh/2 + 30);
+
+        ctx.restore();
     }
 
     function createParticles(x, y, color, count = 14) {
@@ -549,7 +618,7 @@
 
         player.x = width / 2 - player.w / 2;
         player.targetX = player.x;
-        player.y = height - 95;
+        player.y = height - 100;
 
         const timeEl = document.getElementById('time-display');
         timeEl.classList.remove('danger-time');
@@ -620,20 +689,18 @@
     }
 
     function drawBasket() {
-        // حرکت نرم سبد به سمت انگشت کاربر
         player.x += (player.targetX - player.x) * 0.35;
 
         ctx.save();
-        // هاله نورانی در حالت تب طلایی
         if (isFever) {
             ctx.shadowColor = "#ffd700";
             ctx.shadowBlur = 25;
         }
 
-        // بدنه کیسه خرید لوکس
+        // بدنه کیسه خرید مشکی-طلایی
         const grad = ctx.createLinearGradient(player.x, player.y, player.x, player.y + player.h);
-        grad.addColorStop(0, isFever ? "#3d2e05" : "#1f1f1f");
-        grad.addColorStop(1, "#080808");
+        grad.addColorStop(0, isFever ? "#3d2e05" : "#181818");
+        grad.addColorStop(1, "#050505");
 
         ctx.fillStyle = grad;
         ctx.strokeStyle = isFever ? "#fff066" : "#d4af37";
@@ -644,20 +711,39 @@
         ctx.fill();
         ctx.stroke();
 
-        // دسته کیسه خرید
+        // دسته کیسه
         ctx.beginPath();
         ctx.arc(player.x + player.w / 2, player.y, 16, Math.PI, 0);
         ctx.stroke();
 
-        // لوگو و متن برند
+        // نمایش لوگوی دایره‌ای واقعی ماهان پرفیوم وسط سبد
         ctx.shadowBlur = 0;
-        ctx.fillStyle = "#ffd700";
-        ctx.font = "900 13px Vazirmatn";
-        ctx.textAlign = "center";
-        ctx.fillText("MAHAN", player.x + player.w / 2, player.y + 27);
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "400 9px Vazirmatn";
-        ctx.fillText("PERFUME", player.x + player.w / 2, player.y + 42);
+        if (logoLoaded) {
+            const r = 24;
+            const cx = player.x + player.w / 2;
+            const cy = player.y + player.h / 2;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(logoImg, cx - r, cy - r, r * 2, r * 2);
+            ctx.restore();
+
+            ctx.strokeStyle = "#ffd700";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
+        } else {
+            ctx.fillStyle = "#ffd700";
+            ctx.font = "900 13px Vazirmatn";
+            ctx.textAlign = "center";
+            ctx.fillText("MAHAN", player.x + player.w / 2, player.y + 30);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "400 9px Vazirmatn";
+            ctx.fillText("PERFUME", player.x + player.w / 2, player.y + 44);
+        }
+
         ctx.restore();
     }
 
@@ -666,7 +752,6 @@
 
         ctx.clearRect(0, 0, width, height);
 
-        // سرعت تولید آیتم‌ها در ثانیه‌های پایانی بیشتر می‌شود
         const spawnRate = timeLeft <= 8 ? 18 : 25;
         spawnTimer++;
         if (spawnTimer > spawnRate) {
@@ -676,30 +761,36 @@
 
         drawBasket();
 
-        // آیتم‌های در حال سقوط
         for (let i = items.length - 1; i >= 0; i--) {
             let it = items[i];
             it.y += it.speed;
-            it.wobble += 0.08;
-            const drawX = it.x + Math.sin(it.wobble) * 6;
+            it.wobble += 0.07;
+            const drawX = it.x + Math.sin(it.wobble) * 5;
+            const tilt = Math.sin(it.wobble) * 0.15;
 
-            // هاله پشت اکسیر ویژه
-            if (it.type === 'elixir' || it.type === 'time') {
+            if (it.type === 'silver_bottle') {
+                drawMahanBottle(drawX, it.y, false, tilt);
+            } else if (it.type === 'blue_bottle') {
+                drawMahanBottle(drawX, it.y, true, tilt);
+            } else if (it.type === 'time') {
                 ctx.save();
                 ctx.beginPath();
-                ctx.arc(drawX, it.y - 12, 22, 0, Math.PI * 2);
-                ctx.fillStyle = it.type === 'elixir' ? "rgba(255, 215, 0, 0.2)" : "rgba(56, 189, 248, 0.25)";
+                ctx.arc(drawX, it.y - 10, 20, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
                 ctx.fill();
+                ctx.font = "34px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("⏳", drawX, it.y);
                 ctx.restore();
+            } else if (it.type === 'bomb') {
+                ctx.font = "36px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("💣", drawX, it.y);
             }
-
-            ctx.font = `${it.size}px Arial`;
-            ctx.textAlign = "center";
-            ctx.fillText(it.emoji, drawX, it.y);
 
             // برخورد با سبد
             if (
-                it.y + 8 >= player.y &&
+                it.y + 14 >= player.y &&
                 it.y - 22 <= player.y + player.h &&
                 drawX >= player.x - 12 &&
                 drawX <= player.x + player.w + 12
@@ -723,13 +814,13 @@
                         playSound('bonus');
                         createParticles(drawX, player.y, "#38bdf8", 16);
                         floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${it.addTime} ثانیه!`, color: "#38bdf8", alpha: 1 });
-                    } else if (it.type === 'elixir') {
+                    } else if (it.type === 'blue_bottle') {
                         playSound('bonus');
-                        createParticles(drawX, player.y, "#ffd700", 20);
-                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained} ✨`, color: "#ffd700", alpha: 1 });
+                        createParticles(drawX, player.y, "#60a5fa", 20);
+                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained} 💙`, color: "#93c5fd", alpha: 1 });
                     } else {
                         playSound('catch', comboCount);
-                        createParticles(drawX, player.y, "#f3e5ab", 10);
+                        createParticles(drawX, player.y, "#ffd700", 12);
                         floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained}`, color: "#4ade80", alpha: 1 });
                     }
                 }
@@ -739,16 +830,15 @@
                 continue;
             }
 
-            // اگر عطر از دست رفت و به زمین افتاد، کمبو صفر می‌شود
-            if (it.y > height + 30) {
-                if (it.type === 'perfume') {
+            if (it.y > height + 40) {
+                if (it.type === 'silver_bottle' || it.type === 'blue_bottle') {
                     updateCombo(true);
                 }
                 items.splice(i, 1);
             }
         }
 
-        // ذرات درخشان (Particles)
+        // ذرات درخشان
         for (let i = particles.length - 1; i >= 0; i--) {
             let p = particles[i];
             p.x += p.vx;
