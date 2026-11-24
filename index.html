@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>چالش طلایی ماهان پرفیوم</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            background: radial-gradient(circle at 50% 20%, #2b210a 0%, #090909 75%);
+            border-left: 1px solid #d4af3744;
+            border-right: 1px solid #d4af3744;
+            overflow: hidden;
+            transition: transform 0.05s;
+        }
+
+        /* هدر امتیاز، زمان و کمبو */
+        #hud {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid #d4af3788;
+            padding: 10px 16px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #e5d599;
+        }
+
+        .hud-value {
+            color: #ffd700;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .danger-time {
+            color: #ff4d4d !important;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.25); }
+        }
+
+        /* نوار کمبو */
+        #combo-badge {
+            position: absolute;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: linear-gradient(90deg, #ff8c00, #ffd700);
+            color: #000;
+            font-weight: 900;
+            font-size: 13px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #combo-badge.active {
+            transform: translateX(-50%) scale(1);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* صفحات منو و پایان بازی */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 8, 8, 0.93);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* لوگوی دایره‌ای مشکی و طلایی ماهان پرفیوم */
+        .brand-logo {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 2.5px solid #ffd700;
+            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .brand-logo span:first-child {
+            color: #ffd700;
+            font-weight: 900;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .brand-logo span:last-child {
+            color: #ffffff;
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            margin-top: 2px;
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 25px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+
+        p {
+            color: #cccccc;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .rules-box {
+            background: rgba(255, 215, 0, 0.07);
+            border: 1px solid #d4af3755;
+            border-radius: 16px;
+            padding: 12px;
+            width: 100%;
+            margin-bottom: 22px;
+            font-size: 12px;
+            color: #f5f5f5;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .rule-item {
+            background: rgba(0,0,0,0.4);
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+            color: #000;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.45);
+            transition: transform 0.15s ease;
+            width: 100%;
+            max-width: 280px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #ffd700;
+            border: 1.5px solid #ffd700;
+            box-shadow: none;
+            font-size: 14px;
+            padding: 11px 24px;
+        }
+
+        /* باکس کد تخفیف */
+        .coupon-box {
+            background: linear-gradient(145deg, #1a160c, #0f0f0f);
+            border: 2px dashed #ffd700;
+            border-radius: 18px;
+            padding: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 12px 0 18px 0;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
+        }
+
+        .coupon-title {
+            font-size: 13px;
+            color: #e5d599;
+            margin-bottom: 6px;
+        }
+
+        .coupon-code {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffd700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .copy-btn {
+            background: #2e2510;
+            color: #ffd700;
+            border: 1px solid #ffd70088;
+            padding: 7px 18px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .best-score-tag {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- نوار وضعیت بالا -->
+    <div id="hud">
+        <div class="hud-item">امتیاز: <span id="score-display" class="hud-value">0</span></div>
+        <div class="hud-item">رکورد: <span id="best-display" class="hud-value" style="font-size:16px;">0</span></div>
+        <div class="hud-item">زمان: <span id="time-display" class="hud-value">30</span></div>
+    </div>
+
+    <!-- نشانگر کمبو -->
+    <div id="combo-badge">🔥 کمبو ×۲ فعال شد!</div>
+
+    <!-- صفحه بوم بازی -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- صفحه شروع -->
+    <div id="start-screen" class="overlay">
+        <div class="brand-logo">
+            <span>MAHAN</span>
+            <span>PERFUME</span>
+        </div>
+        <h1>شکار اکسیر طلایی</h1>
+        <p>شیشه‌های عطر را بدون خطا بگیر تا وارد حالت <b>تب طلایی (امتیاز ۲ برابر)</b> شوی و کد تخفیف ویژه بگیری!</p>
+        
+        <div class="rules-box">
+            <div class="rule-item">🧴 عطر کلاسیک: <b>+۱۰</b></div>
+            <div class="rule-item">✨ اکسیر ویژه: <b>+۳۰</b></div>
+            <div class="rule-item">⏳ ساعت شنی: <b>+۳ ثانیه</b></div>
+            <div class="rule-item">💣 بمب دودزا: <b>-۲۵ امتیاز</b></div>
+        </div>
+
+        <button class="btn" onclick="startGame()">شروع چالش</button>
+    </div>
+
+    <!-- صفحه پایان بازی -->
+    <div id="end-screen" class="overlay hidden">
+        <div class="brand-logo">
+            <span>MAHAN</span>
+            <span>PERFUME</span>
+        </div>
+        <h1 id="end-title">فوق‌العاده بود!</h1>
+        <p style="margin-bottom: 4px;">امتیاز شما: <b id="final-score" style="color:#ffd700; font-size:22px;">0</b></p>
+        <div class="best-score-tag">بهترین رکورد شما: <span id="end-best-score">0</span></div>
+
+        <div id="reward-section" class="coupon-box">
+            <div id="reward-desc" class="coupon-title">جایزه شما: ۲۰٪ تخفیف خرید</div>
+            <div id="coupon-text" class="coupon-code">MAHAN20</div>
+            <button class="copy-btn" onclick="copyCoupon()">کپی کردن کد تخفیف</button>
+        </div>
+
+        <a id="shop-link" href="https://instagram.com" target="_blank" class="btn">ورود به پیج و استفاده از کد</a>
+        <button class="btn btn-outline" onclick="startGame()">بازی مجدد (شکستن رکورد)</button>
+    </div>
+
+    <!-- صفحه انقضای کمپین -->
+    <div id="expired-screen" class="overlay hidden">
+        <div class="brand-logo">
+            <span>MAHAN</span>
+            <span>PERFUME</span>
+        </div>
+        <h1>مهلت جشنواره تمام شد!</h1>
+        <p>این چالش به پایان رسیده است. برای شرکت در چالش‌های بعدی، پیج ما را دنبال کنید.</p>
+        <a id="expired-shop-link" href="https://instagram.com" target="_blank" class="btn">ورود به پیج اینستاگرام</a>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // بخش تنظیمات سریع (مخصوص شخصی‌سازی مشتریان)
+    // ==========================================
+    const CONFIG = {
+        brandName: "ماهان پرفیوم",
+        instagramUrl: "https://instagram.com", // آدرس پیج اینستاگرامت را اینجا بگذار
+        gameDuration: 30,
+        expiryDate: "2027-12-30",
+        
+        tiers: [
+            { minScore: 350, discountText: "شاهکار! جایزه الماسی: ۳۰٪ تخفیف", code: "MAHAN30" },
+            { minScore: 180, discountText: "عالی بود! جایزه طلایی: ۲۰٪ تخفیف", code: "MAHAN20" },
+            { minScore: 20,  discountText: "هدیه شما: ۱۰٪ تخفیف خرید", code: "MAHAN10" }
+        ]
+    };
+
+    // بررسی تاریخ انقضا
+    if (new Date() > new Date(CONFIG.expiryDate)) {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('expired-screen').classList.remove('hidden');
+        document.getElementById('expired-shop-link').href = CONFIG.instagramUrl;
+    }
+
+    document.getElementById('shop-link').href = CONFIG.instagramUrl;
+
+    // سیستم تولید افکت صوتی بدون نیاز به فایل خارجی
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function playSound(type, combo = 1) {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'catch') {
+            osc.type = 'sine';
+            // با بالا رفتن کمبو، صدای زنگوله زیرتر و هیجانی‌تر می‌شود
+            const baseFreq = 520 + Math.min(combo * 45, 450);
+            osc.frequency.setValueAtTime(baseFreq, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.12);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } else if (type === 'bonus') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.setValueAtTime(800, now + 0.08);
+            osc.frequency.setValueAtTime(1100, now + 0.16);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'bomb') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(140, now);
+            osc.frequency.exponentialRampToValueAtTime(35, now + 0.35);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+            osc.start(now);
+            osc.stop(now + 0.38);
+        }
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+
+    let width, height;
+    function resize() {
+        width = container.clientWidth;
+        height = container.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let score = 0;
+    let bestScore = localStorage.getItem('mahan_best_score') || 0;
+    document.getElementById('best-display').innerText = bestScore;
+
+    let timeLeft = CONFIG.gameDuration;
+    let gameRunning = false;
+    let items = [];
+    let particles = [];
+    let floatingTexts = [];
+    let timerInterval;
+    let spawnTimer = 0;
+    let comboCount = 0;
+    let isFever = false;
+
+    const player = {
+        w: 90,
+        h: 58,
+        x: width / 2 - 45,
+        y: height - 95,
+        targetX: width / 2 - 45
+    };
+
+    function handleInput(clientX) {
+        const rect = canvas.getBoundingClientRect();
+        let tx = clientX - rect.left - player.w / 2;
+        if (tx < 10) tx = 10;
+        if (tx > width - player.w - 10) tx = width - player.w - 10;
+        player.targetX = tx;
+    }
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (!gameRunning) return;
+        e.preventDefault();
+        handleInput(e.touches[0].clientX);
+    }, { passive: false });
+
+    canvas.addEventListener('touchstart', (e) => {
+        if (!gameRunning) return;
+        handleInput(e.touches[0].clientX);
+    }, { passive: false });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!gameRunning) return;
+        handleInput(e.clientX);
+    });
+
+    const itemTypes = [
+        { type: 'perfume', emoji: "🧴", points: 10, speed: 4.8, weight: 58 },
+        { type: 'elixir',  emoji: "✨", points: 30, speed: 6.5, weight: 14 },
+        { type: 'time',    emoji: "⏳", points: 5,  speed: 6.0, weight: 8, addTime: 3 },
+        { type: 'bomb',    emoji: "💣", points: -25, speed: 5.8, weight: 20 }
+    ];
+
+    function spawnItem() {
+        const rand = Math.random() * 100;
+        let selected = itemTypes[0];
+        let sum = 0;
+        for (let t of itemTypes) {
+            sum += t.weight;
+            if (rand <= sum) {
+                selected = t;
+                break;
+            }
+        }
+
+        // در ۵ ثانیه آخر سرعت بازی هیجانی‌تر می‌شود
+        const speedBoost = timeLeft <= 5 ? 2.2 : 0;
+
+        items.push({
+            x: Math.random() * (width - 60) + 30,
+            y: -40,
+            size: 38,
+            speed: selected.speed + speedBoost + (Math.random() * 1.4),
+            type: selected.type,
+            emoji: selected.emoji,
+            points: selected.points,
+            addTime: selected.addTime || 0,
+            wobble: Math.random() * Math.PI * 2
+        });
+    }
+
+    function createParticles(x, y, color, count = 14) {
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: Math.random() * 4 + 2,
+                color: color,
+                alpha: 1
+            });
+        }
+    }
+
+    function shakeScreen() {
+        container.style.transform = "translate(6px, -6px)";
+        setTimeout(() => { container.style.transform = "translate(-6px, 6px)"; }, 50);
+        setTimeout(() => { container.style.transform = "translate(4px, 4px)"; }, 100);
+        setTimeout(() => { container.style.transform = "translate(0, 0)"; }, 150);
+    }
+
+    function updateCombo(reset = false) {
+        const badge = document.getElementById('combo-badge');
+        if (reset) {
+            comboCount = 0;
+            isFever = false;
+            badge.classList.remove('active');
+            return;
+        }
+        comboCount++;
+        if (comboCount >= 5) {
+            isFever = true;
+            badge.innerText = `🔥 تب طلایی! امتیاز ×۲ (کمبو ${comboCount})`;
+            badge.classList.add('active');
+        }
+    }
+
+    function startGame() {
+        score = 0;
+        timeLeft = CONFIG.gameDuration;
+        items = [];
+        particles = [];
+        floatingTexts = [];
+        updateCombo(true);
+
+        player.x = width / 2 - player.w / 2;
+        player.targetX = player.x;
+        player.y = height - 95;
+
+        const timeEl = document.getElementById('time-display');
+        timeEl.classList.remove('danger-time');
+        timeEl.innerText = timeLeft;
+        document.getElementById('score-display').innerText = score;
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+
+        gameRunning = true;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timeEl.innerText = timeLeft;
+            if (timeLeft <= 5 && timeLeft > 0) {
+                timeEl.classList.add('danger-time');
+            }
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }, 1000);
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+        gameRunning = false;
+        clearInterval(timerInterval);
+
+        if (score > bestScore) {
+            bestScore = score;
+            localStorage.setItem('mahan_best_score', bestScore);
+            document.getElementById('best-display').innerText = bestScore;
+        }
+
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('end-best-score').innerText = bestScore;
+
+        let wonTier = null;
+        for (let tier of CONFIG.tiers) {
+            if (score >= tier.minScore) {
+                wonTier = tier;
+                break;
+            }
+        }
+
+        const rewardSection = document.getElementById('reward-section');
+        if (wonTier) {
+            rewardSection.classList.remove('hidden');
+            document.getElementById('end-title').innerText = "تبریک! برنده شدید";
+            document.getElementById('reward-desc').innerText = wonTier.discountText;
+            document.getElementById('coupon-text').innerText = wonTier.code;
+            playSound('bonus');
+        } else {
+            rewardSection.classList.add('hidden');
+            document.getElementById('end-title').innerText = "کمی بیشتر تلاش کن!";
+        }
+
+        document.getElementById('end-screen').classList.remove('hidden');
+    }
+
+    function copyCoupon() {
+        const code = document.getElementById('coupon-text').innerText;
+        navigator.clipboard.writeText(code);
+        const btn = document.querySelector('.copy-btn');
+        btn.innerText = "کپی شد! ✔";
+        setTimeout(() => { btn.innerText = "کپی کردن کد تخفیف"; }, 2000);
+    }
+
+    function drawBasket() {
+        // حرکت نرم سبد به سمت انگشت کاربر
+        player.x += (player.targetX - player.x) * 0.35;
+
+        ctx.save();
+        // هاله نورانی در حالت تب طلایی
+        if (isFever) {
+            ctx.shadowColor = "#ffd700";
+            ctx.shadowBlur = 25;
+        }
+
+        // بدنه کیسه خرید لوکس
+        const grad = ctx.createLinearGradient(player.x, player.y, player.x, player.y + player.h);
+        grad.addColorStop(0, isFever ? "#3d2e05" : "#1f1f1f");
+        grad.addColorStop(1, "#080808");
+
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = isFever ? "#fff066" : "#d4af37";
+        ctx.lineWidth = isFever ? 3.5 : 2.5;
+
+        ctx.beginPath();
+        ctx.roundRect(player.x, player.y, player.w, player.h, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        // دسته کیسه خرید
+        ctx.beginPath();
+        ctx.arc(player.x + player.w / 2, player.y, 16, Math.PI, 0);
+        ctx.stroke();
+
+        // لوگو و متن برند
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#ffd700";
+        ctx.font = "900 13px Vazirmatn";
+        ctx.textAlign = "center";
+        ctx.fillText("MAHAN", player.x + player.w / 2, player.y + 27);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "400 9px Vazirmatn";
+        ctx.fillText("PERFUME", player.x + player.w / 2, player.y + 42);
+        ctx.restore();
+    }
+
+    function gameLoop() {
+        if (!gameRunning) return;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // سرعت تولید آیتم‌ها در ثانیه‌های پایانی بیشتر می‌شود
+        const spawnRate = timeLeft <= 8 ? 18 : 25;
+        spawnTimer++;
+        if (spawnTimer > spawnRate) {
+            spawnItem();
+            spawnTimer = 0;
+        }
+
+        drawBasket();
+
+        // آیتم‌های در حال سقوط
+        for (let i = items.length - 1; i >= 0; i--) {
+            let it = items[i];
+            it.y += it.speed;
+            it.wobble += 0.08;
+            const drawX = it.x + Math.sin(it.wobble) * 6;
+
+            // هاله پشت اکسیر ویژه
+            if (it.type === 'elixir' || it.type === 'time') {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(drawX, it.y - 12, 22, 0, Math.PI * 2);
+                ctx.fillStyle = it.type === 'elixir' ? "rgba(255, 215, 0, 0.2)" : "rgba(56, 189, 248, 0.25)";
+                ctx.fill();
+                ctx.restore();
+            }
+
+            ctx.font = `${it.size}px Arial`;
+            ctx.textAlign = "center";
+            ctx.fillText(it.emoji, drawX, it.y);
+
+            // برخورد با سبد
+            if (
+                it.y + 8 >= player.y &&
+                it.y - 22 <= player.y + player.h &&
+                drawX >= player.x - 12 &&
+                drawX <= player.x + player.w + 12
+            ) {
+                if (it.type === 'bomb') {
+                    score = Math.max(0, score + it.points);
+                    updateCombo(true);
+                    playSound('bomb');
+                    shakeScreen();
+                    createParticles(drawX, player.y, "#ef4444", 20);
+                    floatingTexts.push({ x: drawX, y: player.y - 10, text: "-25 💣", color: "#ff4d4d", alpha: 1 });
+                } else {
+                    updateCombo(false);
+                    const multiplier = isFever ? 2 : 1;
+                    const gained = it.points * multiplier;
+                    score += gained;
+
+                    if (it.addTime > 0) {
+                        timeLeft += it.addTime;
+                        document.getElementById('time-display').innerText = timeLeft;
+                        playSound('bonus');
+                        createParticles(drawX, player.y, "#38bdf8", 16);
+                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${it.addTime} ثانیه!`, color: "#38bdf8", alpha: 1 });
+                    } else if (it.type === 'elixir') {
+                        playSound('bonus');
+                        createParticles(drawX, player.y, "#ffd700", 20);
+                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained} ✨`, color: "#ffd700", alpha: 1 });
+                    } else {
+                        playSound('catch', comboCount);
+                        createParticles(drawX, player.y, "#f3e5ab", 10);
+                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained}`, color: "#4ade80", alpha: 1 });
+                    }
+                }
+
+                document.getElementById('score-display').innerText = score;
+                items.splice(i, 1);
+                continue;
+            }
+
+            // اگر عطر از دست رفت و به زمین افتاد، کمبو صفر می‌شود
+            if (it.y > height + 30) {
+                if (it.type === 'perfume') {
+                    updateCombo(true);
+                }
+                items.splice(i, 1);
+            }
+        }
+
+        // ذرات درخشان (Particles)
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= 0.035;
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            if (p.alpha <= 0) particles.splice(i, 1);
+        }
+
+        // متن‌های امتیاز شناور
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            let ft = floatingTexts[i];
+            ft.y -= 1.8;
+            ft.alpha -= 0.025;
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, ft.alpha);
+            ctx.fillStyle = ft.color;
+            ctx.font = "900 18px Vazirmatn";
+            ctx.textAlign = "center";
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.restore();
+            if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+</script>
+</body>
+</html>
