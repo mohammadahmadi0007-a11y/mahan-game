@@ -1,876 +1,948 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>چالش شکار عطر | ماهان پرفیوم</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap');
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: 'Vazirmatn', sans-serif;
-        }
-
-        body {
-            background-color: #050505;
-            color: #ffffff;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        #game-container {
-            position: relative;
-            width: 100%;
-            max-width: 450px;
-            height: 100%;
-            background: radial-gradient(circle at 50% 20%, #2b210a 0%, #080808 75%);
-            border-left: 1px solid #d4af3744;
-            border-right: 1px solid #d4af3744;
-            overflow: hidden;
-            transition: transform 0.05s;
-        }
-
-        /* هدر امتیاز، زمان و رکورد */
-        #hud {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            right: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            background: rgba(15, 15, 15, 0.85);
-            border: 1px solid #d4af3788;
-            padding: 10px 16px;
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-        }
-
-        .hud-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 700;
-            font-size: 14px;
-            color: #e5d599;
-        }
-
-        .hud-value {
-            color: #ffd700;
-            font-size: 20px;
-            font-weight: 900;
-        }
-
-        .danger-time {
-            color: #ff4d4d !important;
-            animation: pulse 0.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.25); }
-        }
-
-        /* نوار کمبو */
-        #combo-badge {
-            position: absolute;
-            top: 72px;
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: linear-gradient(90deg, #ff8c00, #ffd700);
-            color: #000;
-            font-weight: 900;
-            font-size: 13px;
-            padding: 4px 16px;
-            border-radius: 20px;
-            z-index: 10;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        #combo-badge.active {
-            transform: translateX(-50%) scale(1);
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* صفحات منو و پایان بازی */
-        .overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(8, 8, 8, 0.94);
-            backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            text-align: center;
-            z-index: 20;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* تصویر لوگوی واقعی ماهان پرفیوم */
-        .brand-logo-img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 12px;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.45);
-            border: 2px solid #ffd700;
-        }
-
-        h1 {
-            color: #ffd700;
-            font-size: 23px;
-            font-weight: 900;
-            margin-bottom: 6px;
-            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
-        }
-
-        .brand-slogan {
-            color: #f3e5ab;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        p {
-            color: #cccccc;
-            font-size: 13.5px;
-            line-height: 1.7;
-            margin-bottom: 16px;
-        }
-
-        .rules-box {
-            background: rgba(255, 215, 0, 0.07);
-            border: 1px solid #d4af3755;
-            border-radius: 16px;
-            padding: 12px;
-            width: 100%;
-            margin-bottom: 20px;
-            font-size: 12px;
-            color: #f5f5f5;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .rule-item {
-            background: rgba(0,0,0,0.45);
-            padding: 7px;
-            border-radius: 8px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
-            color: #000;
-            border: none;
-            padding: 14px 32px;
-            font-size: 16px;
-            font-weight: 900;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.45);
-            transition: transform 0.15s ease;
-            width: 100%;
-            max-width: 280px;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #ffd700;
-            border: 1.5px solid #ffd700;
-            box-shadow: none;
-            font-size: 14px;
-            padding: 11px 24px;
-        }
-
-        /* باکس کد تخفیف */
-        .coupon-box {
-            background: linear-gradient(145deg, #1a160c, #0f0f0f);
-            border: 2px dashed #ffd700;
-            border-radius: 18px;
-            padding: 16px;
-            width: 100%;
-            max-width: 300px;
-            margin: 12px 0 18px 0;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
-        }
-
-        .coupon-title {
-            font-size: 13px;
-            color: #e5d599;
-            margin-bottom: 6px;
-        }
-
-        .coupon-code {
-            font-size: 26px;
-            font-weight: 900;
-            color: #ffd700;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-        }
-
-        .copy-btn {
-            background: #2e2510;
-            color: #ffd700;
-            border: 1px solid #ffd70088;
-            padding: 7px 18px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .best-score-tag {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 14px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SWITCH | ماهان پرفیوم</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent;font-family:'Vazirmatn',Tahoma,sans-serif}
+html,body{width:100%;height:100%;background:#050505;color:#f8fafc;overflow:hidden}
+#wrap{position:relative;width:100%;max-width:480px;height:100%;margin:0 auto;background:#0a0a0a;overflow:hidden;touch-action:manipulation;border-left:1px solid #d4af3733;border-right:1px solid #d4af3733}
+canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;top:0;left:0;right:0;height:54px;background:rgba(12,12,12,.92);border-bottom:1px solid rgba(212,175,55,.25);padding:0 14px;display:flex;justify-content:space-between;align-items:center;z-index:10;pointer-events:none;backdrop-filter:blur(8px)}
+.hud-left{font-size:13px;color:#f3e5ab;font-weight:700;pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:10px}
+.hud-btns{display:flex;gap:8px;pointer-events:auto}
+.icon-btn{width:35px;height:35px;border-radius:50%;background:#1a1a1a;border:1px solid #d4af3766;color:#ffd700;font-size:14px;display:flex;justify-content:center;align-items:center;cursor:pointer}
+.icon-btn:active{transform:scale(.92)}
+.overlay{position:absolute;inset:0;background:rgba(8,8,8,.94);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px;z-index:25;overflow-y:auto;backdrop-filter:blur(10px)}
+#start-screen{background:rgba(8,8,8,.88)}
+#over-screen{background:rgba(8,8,8,.95)}
+.hd{display:none!important}
+.brand-logo-img{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid #ffd700;box-shadow:0 0 25px rgba(255,215,0,.35);margin-bottom:8px}
+.logo{font-size:28px;font-weight:900;color:#ffd700;margin-bottom:2px;letter-spacing:1px}
+.logo span{color:#ffffff}
+.sub{font-size:12px;color:#cbd5e1;margin-bottom:12px;text-align:center;line-height:1.6}
+.name-input{width:100%;max-width:350px;background:#141414;border:1.5px solid #d4af3766;border-radius:12px;padding:9px 14px;color:#fff;font-size:13px;margin-bottom:10px;text-align:center;outline:none}
+.name-input:focus{border-color:#ffd700}
+.card{width:100%;max-width:350px;background:#121212;border:1.5px solid #d4af3744;border-radius:18px;padding:12px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.card-title{font-size:12px;font-weight:700;color:#ffd700;margin-bottom:8px;display:flex;justify-content:space-between}
+.lb-list{max-height:135px;overflow-y:auto}
+.lb-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:10px;margin-bottom:5px;background:#1a1a1a;font-size:12px;color:#f1f5f9}
+.lb-row.me{background:rgba(212,175,55,.18);border:1px solid #ffd700}
+.lb-user{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.av{width:26px;height:26px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-weight:900;font-size:11px;color:#000;flex-shrink:0}
+.lb-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+.btn{width:100%;max-width:350px;padding:13px;border:none;border-radius:14px;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:8px;text-decoration:none;display:inline-block;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-play{background:linear-gradient(135deg,#ffd700,#b8860b);color:#000;box-shadow:0 4px 18px rgba(255,215,0,.35)}
+.btn-shop{background:#1c1910;color:#ffd700;border:1.5px solid #d4af3788}
+.btn-share{background:#18181b;color:#e2e8f0;font-size:13px;border:1px solid #3f3f46}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:350px;margin-bottom:10px}
+.stat{background:#141414;border:1.5px solid #d4af3744;border-radius:14px;padding:8px;text-align:center}
+.coupon-box{width:100%;max-width:350px;background:linear-gradient(145deg,#1d1709,#0f0f0f);border:2px dashed #ffd700;border-radius:16px;padding:12px;text-align:center;margin-bottom:10px;box-shadow:0 0 20px rgba(255,215,0,.15)}
+.coupon-code{font-size:22px;font-weight:900;color:#ffd700;letter-spacing:3px;margin:4px 0 8px 0}
+.copy-btn{background:#2e2510;color:#ffd700;border:1px solid #ffd70088;padding:5px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer}
+.skins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:350px;margin-bottom:14px}
+.sk-item{background:#141414;border:2px solid #27272a;border-radius:16px;padding:10px 6px;text-align:center;cursor:pointer;color:#fff}
+.sk-item:active{transform:scale(.95)}
+.sk-item.active{border-color:#ffd700;background:rgba(212,175,55,.15)}
+.sk-dot{width:30px;height:30px;border-radius:50%;margin:0 auto 6px;overflow:hidden;background:#000}
+.sk-dot img{width:100%;height:100%;object-fit:cover}
+.brand-tag{margin-top:4px;padding:6px 14px;border-radius:20px;background:#141414;border:1px solid #d4af3744;font-size:11px;color:#cbd5e1;cursor:pointer;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+.brand-tag b{color:#ffd700;direction:ltr}
+#toast{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:#ffd700;color:#000;padding:7px 15px;border-radius:11px;font-size:12px;font-weight:900;z-index:50;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}
+</style>
 </head>
 <body>
+<div id="wrap">
+<div id="toast"></div>
+<div class="hud">
+<div class="hud-left" onclick="openMenu()"><span>🏆 <span id="hud-best">0</span></span><span style="color:#ffd700">🧴 <span id="hud-stars">0</span></span></div>
+<div style="font-size:13px;font-weight:900;color:#ffd700;letter-spacing:1px">MAHAN SWITCH</div>
+<div class="hud-btns">
+<button class="icon-btn" id="btn-snd" onclick="toggleSound()">🔊</button>
+<button class="icon-btn" id="btn-pause" onclick="togglePause()">⏸</button>
+</div>
+</div>
 
-<div id="game-container">
-    <!-- نوار وضعیت بالا -->
-    <div id="hud">
-        <div class="hud-item">امتیاز: <span id="score-display" class="hud-value">0</span></div>
-        <div class="hud-item">رکورد: <span id="best-display" class="hud-value" style="font-size:16px;">0</span></div>
-        <div class="hud-item">زمان: <span id="time-display" class="hud-value">30</span></div>
-    </div>
+<canvas id="cv"></canvas>
 
-    <!-- نشانگر کمبو -->
-    <div id="combo-badge">🔥 کمبو ×۲ فعال شد!</div>
+<!-- صفحه شروع -->
+<div class="overlay" id="start-screen">
+<img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
+<div class="logo">⚡ SWITCH <span>PERFUME</span></div>
+<div class="sub">با ضربه زدن بین دیوارهای طلایی جابه‌جا شو، <b>شیشه‌های عطر ماهان</b> را شکار کن و تا <b>۳۰٪ کد تخفیف</b> بگیر!</div>
+<input type="text" id="player-name-input" class="name-input" placeholder="نام یا آیدی اینستاگرامت را بنویس (اختیاری)" maxlength="22">
+<div class="card">
+<div class="card-title"><span>🏆 برترین رکوردهای چالش</span><span id="my-rank" style="color:#f3e5ab;font-size:11px"></span></div>
+<div class="lb-list" id="lb-start">در حال دریافت...</div>
+</div>
+<button class="btn btn-play" onclick="startGame()">شروع چالش و شکار تخفیف</button>
+<button class="btn btn-shop" onclick="openShop('start')">🛒 فروشگاه هاله‌های لوکس (🧴 <span id="menu-stars">0</span>)</button>
+<a class="brand-tag" href="https://instagram.com/mahan___perfume" target="_blank">🌙 پیج اینستاگرام: <b>@mahan___perfume</b></a>
+</div>
 
-    <!-- صفحه بوم بازی -->
-    <canvas id="gameCanvas"></canvas>
+<!-- فروشگاه هاله دور لوگو -->
+<div class="overlay hd" id="shop-screen">
+<div class="logo" style="font-size:22px">🛒 فروشگاه هاله‌های لوگو</div>
+<div class="sub">موجودی شیشه عطر شما: <b style="color:#ffd700" id="shop-stars">0</b> 🧴</div>
+<div class="skins-grid" id="skins-grid"></div>
+<button class="btn btn-play" onclick="closeShop()">بازگشت</button>
+</div>
 
-    <!-- صفحه شروع -->
-    <div id="start-screen" class="overlay">
-        <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
-        <h1>شکار عطرهای ماهان پرفیوم</h1>
-        <div class="brand-slogan">🌙 عطر شما امضای شماست 🌙</div>
-        <p>شیشه‌های عطر را بدون خطا بگیر تا وارد حالت <b>تب طلایی (امتیاز ۲ برابر)</b> شوی و کد تخفیف اختصاصی بگیری!</p>
-        
-        <div class="rules-box">
-            <div class="rule-item">🩶 شیشه درب نقره‌ای: <b>+۱۰</b></div>
-            <div class="rule-item">💙 شیشه درب آبی ویژه: <b>+۳۰</b></div>
-            <div class="rule-item">⏳ ساعت شنی: <b>+۳ ثانیه</b></div>
-            <div class="rule-item">💣 بمب دودزا: <b>-۲۵ امتیاز</b></div>
-        </div>
+<!-- توقف بازی -->
+<div class="overlay hd" id="pause-screen">
+<div class="logo" style="color:#ffd700">توقف بازی</div>
+<button class="btn btn-play" onclick="togglePause()">▶️ ادامه بازی</button>
+<button class="btn btn-share" onclick="openMenu()">🏠 منو و جدول امتیازات</button>
+</div>
 
-        <button class="btn" onclick="startGame()">شروع چالش</button>
-    </div>
+<!-- صفحه پایان و نمایش کد تخفیف -->
+<div class="overlay hd" id="over-screen">
+<div class="logo" style="color:#ef4444;font-size:24px">پایان چالش!</div>
+<div class="stats">
+<div class="stat"><div style="font-size:22px;font-weight:900;color:#ffd700" id="end-score">0</div><div style="font-size:11px;color:#94a3b8">امتیاز این دور</div></div>
+<div class="stat"><div style="font-size:22px;font-weight:900;color:#4ade80" id="end-best">0</div><div style="font-size:11px;color:#94a3b8">بهترین رکورد شما</div></div>
+</div>
 
-    <!-- صفحه پایان بازی -->
-    <div id="end-screen" class="overlay hidden">
-        <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
-        <h1 id="end-title">فوق‌العاده بود!</h1>
-        <p style="margin-bottom: 4px;">امتیاز شما: <b id="final-score" style="color:#ffd700; font-size:22px;">0</b></p>
-        <div class="best-score-tag">بهترین رکورد شما: <span id="end-best-score">0</span></div>
+<!-- باکس کد تخفیف -->
+<div id="reward-box" class="coupon-box hd">
+<div id="reward-desc" style="font-size:12px;color:#f3e5ab">تبریک! جایزه شما: ۲۰٪ تخفیف</div>
+<div id="coupon-code" class="coupon-code">MAHAN20</div>
+<button class="copy-btn" onclick="copyCoupon()">کپی کردن کد تخفیف</button>
+</div>
 
-        <div id="reward-section" class="coupon-box">
-            <div id="reward-desc" class="coupon-title">جایزه شما: ۲۰٪ تخفیف خرید</div>
-            <div id="coupon-text" class="coupon-code">MAHAN20</div>
-            <button class="copy-btn" onclick="copyCoupon()">کپی کردن کد تخفیف</button>
-        </div>
+<div class="card">
+<div class="card-title"><span>🏆 جدول نفرات برتر</span></div>
+<div class="lb-list" id="lb-over"></div>
+</div>
+<a id="shop-btn-link" href="https://instagram.com/mahan___perfume" target="_blank" class="btn btn-play">🛍 ورود به پیج و استفاده از تخفیف</a>
+<button class="btn btn-shop" onclick="startGame()">🔄 تلاش مجدد برای امتیاز بالاتر</button>
+<button class="btn btn-share" onclick="shareScore()">📤 کپی رکورد برای کل‌کل با دوستان</button>
+</div>
 
-        <a id="shop-link" href="https://instagram.com/mahan___perfume" target="_blank" class="btn">ورود به پیج و استفاده از کد</a>
-        <button class="btn btn-outline" onclick="startGame()">بازی مجدد (شکستن رکورد)</button>
-    </div>
-
-    <!-- صفحه انقضای کمپین -->
-    <div id="expired-screen" class="overlay hidden">
-        <img src="logo.png" alt="Mahan Perfume" class="brand-logo-img" onerror="this.style.display='none'">
-        <h1>مهلت جشنواره تمام شد!</h1>
-        <p>این چالش به پایان رسیده است. برای شرکت در چالش‌های بعدی، پیج ما را دنبال کنید.</p>
-        <a id="expired-shop-link" href="https://instagram.com/mahan___perfume" target="_blank" class="btn">ورود به پیج اینستاگرام</a>
-    </div>
+<!-- صفحه انقضای اشتراک -->
+<div class="overlay hd" id="expired-screen">
+<img src="logo.png" alt="Logo" class="brand-logo-img" onerror="this.style.display='none'">
+<div class="logo">مهلت چالش تمام شد!</div>
+<div class="sub">این جشنواره به پایان رسیده است. برای چالش‌های بعدی پیج ما را دنبال کنید.</div>
+<a id="expired-link" href="https://instagram.com/mahan___perfume" target="_blank" class="btn btn-play">ورود به پیج اینستاگرام</a>
+</div>
 </div>
 
 <script>
-    // ==========================================
-    // بخش تنظیمات سریع (مخصوص شخصی‌سازی مشتریان)
-    // ==========================================
-    const CONFIG = {
-        brandName: "ماهان پرفیوم",
-        instagramUrl: "https://instagram.com/mahan___perfume",
-        gameDuration: 30,
-        expiryDate: "2027-12-30",
-        
-        tiers: [
-            { minScore: 350, discountText: "شاهکار! جایزه الماسی: ۳۰٪ تخفیف", code: "MAHAN30" },
-            { minScore: 180, discountText: "عالی بود! جایزه طلایی: ۲۰٪ تخفیف", code: "MAHAN20" },
-            { minScore: 20,  discountText: "هدیه شما: ۱۰٪ تخفیف خرید", code: "MAHAN10" }
-        ]
-    };
+// ==========================================
+// تنظیمات اختصاصی برند و کمپین
+// ==========================================
+const CONFIG = {
+    brandName: "ماهان پرفیوم",
+    instagramHandle: "@mahan___perfume",
+    instagramUrl: "https://instagram.com/mahan___perfume",
+    gameUrl: window.location.href,
+    expiryDate: "2027-12-30",
+    dbUrl: "https://kido-db.mohammadahmadi0007.workers.dev/mahan_switch_lb.json",
+    
+    tiers: [
+        { minScore: 45, discountText: "شاهکار! جایزه الماسی: ۳۰٪ تخفیف خرید", code: "MAHAN30" },
+        { minScore: 22, discountText: "عالی بود! جایزه طلایی: ۲۰٪ تخفیف خرید", code: "MAHAN20" },
+        { minScore: 8,  discountText: "هدیه شما: ۱۰٪ تخفیف خرید عطر", code: "MAHAN10" }
+    ]
+};
 
-    if (new Date() > new Date(CONFIG.expiryDate)) {
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('expired-screen').classList.remove('hidden');
-        document.getElementById('expired-shop-link').href = CONFIG.instagramUrl;
+if (new Date() > new Date(CONFIG.expiryDate)) {
+    document.getElementById("start-screen").classList.add("hd");
+    document.getElementById("expired-screen").classList.remove("hd");
+    document.getElementById("expired-link").href = CONFIG.instagramUrl;
+}
+document.getElementById("shop-btn-link").href = CONFIG.instagramUrl;
+
+// بارگذاری لوگوی دایره‌ای ماهان پرفیوم به عنوان توپ بازی
+const logoImg = new Image();
+logoImg.src = "logo.png";
+let logoLoaded = false;
+logoImg.onload = () => { logoLoaded = true; };
+
+let usr = {
+    id: localStorage.getItem("mh_sw_uid") || ("u_" + Math.floor(1e5 + Math.random() * 9e5)),
+    name: localStorage.getItem("mh_sw_name") || "مشتری مهمان"
+};
+localStorage.setItem("mh_sw_uid", usr.id);
+const nameInput = document.getElementById("player-name-input");
+if (usr.name !== "مشتری مهمان") nameInput.value = usr.name;
+
+const GRADS = [
+    "linear-gradient(135deg,#ffd700,#b8860b)",
+    "linear-gradient(135deg,#f59e0b,#d97706)",
+    "linear-gradient(135deg,#38bdf8,#0284c7)",
+    "linear-gradient(135deg,#c084fc,#7e22ce)",
+    "linear-gradient(135deg,#34d399,#059669)"
+];
+function avHtml(p) {
+    let s = 0;
+    for (let i = 0; i < p.id.length; i++) s += p.id.charCodeAt(i);
+    const bg = GRADS[s % GRADS.length], ch = (p.name || "م").trim().charAt(0);
+    return `<div class="av" style="background:${bg}">${ch}</div>`;
+}
+
+let best = parseInt(localStorage.getItem("mh_sw_best") || "0", 10);
+let stars = parseInt(localStorage.getItem("mh_sw_stars") || "0", 10);
+let owned = JSON.parse(localStorage.getItem("mh_sw_owned") || "[0]");
+let curSkin = parseInt(localStorage.getItem("mh_sw_skin") || "0", 10);
+let shopOrigin = "start";
+let lb = [];
+
+const SKINS = [
+    { name: "هاله طلایی", cost: 0, core: "#09090b", glow: "#ffd700" },
+    { name: "یاقوت سرخ", cost: 15, core: "#450a0a", glow: "#ef4444" },
+    { name: "فیروزه", cost: 30, core: "#083344", glow: "#22d3ee" },
+    { name: "بنفش سلطنتی", cost: 50, core: "#3b0764", glow: "#c084fc" },
+    { name: "زمرد", cost: 75, core: "#022c22", glow: "#34d399" },
+    { name: "الماس سفید", cost: 100, core: "#1e293b", glow: "#ffffff" }
+];
+
+function updStars() {
+    localStorage.setItem("mh_sw_stars", stars);
+    document.getElementById("hud-stars").innerText = stars;
+    document.getElementById("menu-stars").innerText = stars;
+    document.getElementById("shop-stars").innerText = stars;
+}
+updStars();
+document.getElementById("hud-best").innerText = best;
+
+function toast(m) {
+    const t = document.getElementById("toast");
+    t.innerText = m;
+    t.style.opacity = "1";
+    setTimeout(() => t.style.opacity = "0", 2000);
+}
+
+function openShop(from = "start") {
+    shopOrigin = from;
+    renderShop();
+    document.getElementById("shop-screen").classList.remove("hd");
+}
+function closeShop() {
+    document.getElementById("shop-screen").classList.add("hd");
+    if (shopOrigin === "over") document.getElementById("over-screen").classList.remove("hd");
+}
+function renderShop() {
+    updStars();
+    document.getElementById("skins-grid").innerHTML = SKINS.map((sk, i) => {
+        const ok = owned.includes(i), act = curSkin === i;
+        return `<div class="sk-item ${act ? 'active' : ''}" onclick="pickSkin(${i})">
+            <div class="sk-dot" style="border:2px solid ${sk.glow};box-shadow:0 0 12px ${sk.glow}"><img src="logo.png" onerror="this.style.display='none'"></div>
+            <div style="font-size:11px;font-weight:700;margin-bottom:3px">${sk.name}</div>
+            <div style="font-size:11px;color:${act ? '#ffd700' : ok ? '#4ade80' : '#f59e0b'}">${act ? 'فعال ✅' : ok ? 'انتخاب' : sk.cost + ' 🧴'}</div>
+        </div>`;
+    }).join("");
+}
+function pickSkin(i) {
+    if (owned.includes(i)) {
+        curSkin = i;
+        localStorage.setItem("mh_sw_skin", i);
+        beep(620, .08);
+        renderShop();
+        toast(SKINS[i].name + " فعال شد!");
+    } else if (stars >= SKINS[i].cost) {
+        stars -= SKINS[i].cost;
+        owned.push(i);
+        curSkin = i;
+        localStorage.setItem("mh_sw_owned", JSON.stringify(owned));
+        localStorage.setItem("mh_sw_skin", i);
+        beep(800, .15);
+        renderShop();
+        toast(SKINS[i].name + " خریداری شد!");
+    } else {
+        toast("تعداد شیشه عطر کافی نداری! 🧴");
     }
+}
 
-    document.getElementById('shop-link').href = CONFIG.instagramUrl;
+async function syncLB(sc) {
+    try {
+        const r = await fetch(CONFIG.dbUrl);
+        let d = await r.json();
+        if (!Array.isArray(d)) d = [];
+        const i = d.findIndex(x => x.id === usr.id);
+        if (i > -1) {
+            if (sc > d[i].score) d[i].score = sc;
+            if (usr.name !== "مشتری مهمان") d[i].name = usr.name;
+            if (d[i].score > best) { best = d[i].score; localStorage.setItem("mh_sw_best", best); }
+        } else if (sc > 0) {
+            d.push({ id: usr.id, name: usr.name, score: sc });
+        }
+        d.sort((a, b) => b.score - a.score);
+        d = d.slice(0, 25);
+        lb = d;
+        if (sc > 0) {
+            await fetch(CONFIG.dbUrl, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
+        }
+    } catch (e) {}
+    document.getElementById("hud-best").innerText = best;
+    const rk = lb.findIndex(x => x.id === usr.id);
+    document.getElementById("my-rank").innerText = rk > -1 ? `رتبه شما: #${rk + 1}` : "";
+    const h = lb.length ? lb.slice(0, 8).map((p, idx) => `<div class="lb-row ${p.id === usr.id ? 'me' : ''}"><div class="lb-user"><span style="width:22px;font-weight:900">${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '#' + (idx + 1)}</span>${avHtml(p)}<span class="lb-name">${p.name}</span></div><strong style="color:#ffd700;margin-right:6px">${p.score}</strong></div>`).join("") : "<div style='text-align:center;color:#94a3b8;font-size:12px;padding:10px'>اولین نفر باش و رکورد بزن!</div>";
+    document.getElementById("lb-start").innerHTML = h;
+    document.getElementById("lb-over").innerHTML = h;
+}
 
-    // بارگذاری تصویر لوگو برای نمایش روی سبد بازی
-    const logoImg = new Image();
-    logoImg.src = "logo.png";
-    let logoLoaded = false;
-    logoImg.onload = () => { logoLoaded = true; };
+let snd = true, ac = null, nextNoteTime = 0, beatStep = 0, bgmRunning = false;
+const BASS = [130.8, 130.8, 164.8, 146.8, 130.8, 130.8, 196.0, 164.8];
+const LEAD = [523.2, 0, 659.2, 784.0, 659.2, 0, 587.3, 523.2];
 
-    // سیستم افکت صوتی
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
+function initAudio() {
+    try {
+        if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+        if (ac.state === "suspended") ac.resume().catch(() => {});
+    } catch (e) {}
+}
+function beepAt(f, d, t, v, when) {
+    if (!snd || document.hidden || !ac) return;
+    try {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = t; o.frequency.value = f;
+        g.gain.setValueAtTime(v, when);
+        g.gain.exponentialRampToValueAtTime(.001, when + d);
+        o.connect(g); g.connect(ac.destination); o.start(when); o.stop(when + d);
+    } catch (e) {}
+}
+function beep(f, d, t = "sine", v = 0.12) {
+    if (!snd || document.hidden) return;
+    initAudio();
+    if (ac) beepAt(f, d, t, v, ac.currentTime);
+}
+function startBGM() {
+    if (!snd || document.hidden) return;
+    initAudio();
+    if (!ac) return;
+    bgmRunning = true;
+    nextNoteTime = ac.currentTime + 0.05;
+}
+function stopBGM() { bgmRunning = false; }
+function updateBGM() {
+    if (!bgmRunning || !snd || st !== "play" || document.hidden || !ac) return;
+    while (nextNoteTime < ac.currentTime + 0.15) {
+        const b = BASS[beatStep % 8], l = LEAD[beatStep % 8];
+        beepAt(b, 0.14, "triangle", 0.04, nextNoteTime);
+        if (l > 0 && beatStep % 2 === 0) beepAt(l, 0.12, "sine", 0.025, nextNoteTime);
+        nextNoteTime += 0.19;
+        beatStep++;
+    }
+}
+function toggleSound() {
+    snd = !snd;
+    document.getElementById("btn-snd").innerText = snd ? "🔊" : "🔇";
+    if (snd && st === "play" && !document.hidden) startBGM(); else stopBGM();
+}
 
-    function playSound(type, combo = 1) {
-        if (!audioCtx) audioCtx = new AudioContext();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        const now = audioCtx.currentTime;
-
-        if (type === 'catch') {
-            osc.type = 'sine';
-            const baseFreq = 520 + Math.min(combo * 45, 450);
-            osc.frequency.setValueAtTime(baseFreq, now);
-            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.12);
-            gain.gain.setValueAtTime(0.18, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-            osc.start(now);
-            osc.stop(now + 0.15);
-        } else if (type === 'bonus') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, now);
-            osc.frequency.setValueAtTime(800, now + 0.08);
-            osc.frequency.setValueAtTime(1100, now + 0.16);
-            gain.gain.setValueAtTime(0.22, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        } else if (type === 'bomb') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(140, now);
-            osc.frequency.exponentialRampToValueAtTime(35, now + 0.35);
-            gain.gain.setValueAtTime(0.3, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
-            osc.start(now);
-            osc.stop(now + 0.38);
+function onVisChange() {
+    if (document.hidden) {
+        stopBGM();
+        if (ac && ac.state === "running") ac.suspend().catch(() => {});
+    } else {
+        lastT = 0;
+        if (snd && st === "play") {
+            if (ac && ac.state === "suspended") ac.resume().catch(() => {});
+            startBGM();
         }
     }
+}
+document.addEventListener("visibilitychange", onVisChange);
+window.addEventListener("pagehide", () => { stopBGM(); if (ac && ac.state === "running") ac.suspend().catch(() => {}); });
 
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const container = document.getElementById('game-container');
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d", { alpha: false });
+let W = 360, H = 640, DPR = 1, WALL = 14, BALL_R = 18, BALL_Y = 450;
 
-    let width, height;
-    function resize() {
-        width = container.clientWidth;
-        height = container.clientHeight;
-        canvas.width = width;
-        canvas.height = height;
+function resize() {
+    W = Math.max(260, window.innerWidth > 480 ? 480 : window.innerWidth);
+    H = Math.max(360, window.innerHeight);
+    DPR = Math.min(2.5, window.devicePixelRatio || 1);
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    BALL_Y = H * 0.72;
+}
+window.addEventListener("resize", resize);
+resize();
+
+let st = "menu", score = 0, side = 0, ballX = WALL + BALL_R, targetX = WALL + BALL_R, switching = false;
+let trails = [], bars = [], greens = [], perfumesList = [], particles = [], floats = [];
+let shake = 0, spawnGap = 0, stepCount = 0, lastSide = -1, dustTimer = 0, trailStampTimer = 0, lastT = 0;
+
+function resetGameState() {
+    side = 0;
+    ballX = WALL + BALL_R;
+    targetX = WALL + BALL_R;
+    switching = false;
+    trails = []; bars = []; greens = []; perfumesList = []; particles = []; floats = [];
+    shake = 0; spawnGap = 110; stepCount = 0; lastSide = -1; dustTimer = 0; trailStampTimer = 0;
+}
+resetGameState();
+
+function getFallSpeed(currentScore) {
+    const baseSpeed = 302;
+    const gradualBoost = Math.pow(Math.max(0, currentScore), 0.78) * 4.5;
+    return baseSpeed + Math.min(205, gradualBoost);
+}
+
+function pickBarWidth(playWidth) {
+    const roll = Math.random();
+    if (roll < 0.32) return playWidth * (0.22 + Math.random() * 0.12);
+    if (roll < 0.72) return playWidth * (0.36 + Math.random() * 0.16);
+    return playWidth * (0.54 + Math.random() * 0.14);
+}
+
+function isSafeGreenSpot(gx, gy, size) {
+    const leftRail = WALL + BALL_R;
+    const rightRail = W - WALL - BALL_R;
+    const clearRadius = size / 2 + BALL_R + 12;
+    if (Math.abs(gx - leftRail) < clearRadius || Math.abs(gx - rightRail) < clearRadius) return false;
+    for (const g of greens) {
+        if (Math.abs(gy - g.y) < 175) return false;
+        if (Math.hypot(gx - g.x, gy - g.y) < 95) return false;
     }
-    window.addEventListener('resize', resize);
-    resize();
-
-    let score = 0;
-    let bestScore = localStorage.getItem('mahan_best_score') || 0;
-    document.getElementById('best-display').innerText = bestScore;
-
-    let timeLeft = CONFIG.gameDuration;
-    let gameRunning = false;
-    let items = [];
-    let particles = [];
-    let floatingTexts = [];
-    let timerInterval;
-    let spawnTimer = 0;
-    let comboCount = 0;
-    let isFever = false;
-
-    const player = {
-        w: 94,
-        h: 64,
-        x: width / 2 - 47,
-        y: height - 100,
-        targetX: width / 2 - 47
-    };
-
-    function handleInput(clientX) {
-        const rect = canvas.getBoundingClientRect();
-        let tx = clientX - rect.left - player.w / 2;
-        if (tx < 10) tx = 10;
-        if (tx > width - player.w - 10) tx = width - player.w - 10;
-        player.targetX = tx;
+    for (const b of bars) {
+        const nearY = Math.abs(gy - (b.y + b.h / 2)) < 64;
+        const overBar = gx + size / 2 + 10 > b.x && gx - size / 2 - 10 < b.x + b.w;
+        if (nearY && overBar) return false;
     }
+    for (const s of perfumesList) {
+        if (Math.hypot(gx - s.x, gy - s.y) < 58) return false;
+    }
+    return true;
+}
 
-    canvas.addEventListener('touchmove', (e) => {
-        if (!gameRunning) return;
-        e.preventDefault();
-        handleInput(e.touches[0].clientX);
-    }, { passive: false });
+function spawnNextWave() {
+    stepCount++;
+    const leftEdge = WALL;
+    const rightEdge = W - WALL;
+    const playWidth = rightEdge - leftEdge;
+    const barH = 20;
 
-    canvas.addEventListener('touchstart', (e) => {
-        if (!gameRunning) return;
-        handleInput(e.touches[0].clientX);
-    }, { passive: false });
+    let fromLeft;
+    if (lastSide === -1) fromLeft = Math.random() > 0.5;
+    else if (Math.random() < 0.68) fromLeft = (lastSide === 0);
+    else fromLeft = (lastSide === 1);
+    lastSide = fromLeft ? 1 : 0;
 
-    canvas.addEventListener('mousemove', (e) => {
-        if (!gameRunning) return;
-        handleInput(e.clientX);
-    });
+    const barW = pickBarWidth(playWidth);
+    const barY = -28;
 
-    const itemTypes = [
-        { type: 'silver_bottle', points: 10, speed: 4.8, weight: 58 }, // شیشه عطر درب نقره‌ای ماهان پرفیوم
-        { type: 'blue_bottle',   points: 30, speed: 6.4, weight: 15 }, // شیشه عطر درب آبی خاص ماهان پرفیوم
-        { type: 'time',          points: 5,  speed: 6.0, weight: 8, addTime: 3 },
-        { type: 'bomb',          points: -25, speed: 5.8, weight: 19 }
-    ];
+    if (fromLeft) bars.push({ x: leftEdge, y: barY, w: barW, h: barH, passed: false });
+    else bars.push({ x: rightEdge - barW, y: barY, w: barW, h: barH, passed: false });
 
-    function spawnItem() {
-        const rand = Math.random() * 100;
-        let selected = itemTypes[0];
-        let sum = 0;
-        for (let t of itemTypes) {
-            sum += t.weight;
-            if (rand <= sum) {
-                selected = t;
-                break;
-            }
-        }
-
-        const speedBoost = timeLeft <= 5 ? 2.2 : 0;
-
-        items.push({
-            x: Math.random() * (width - 60) + 30,
-            y: -45,
-            speed: selected.speed + speedBoost + (Math.random() * 1.4),
-            type: selected.type,
-            points: selected.points,
-            addTime: selected.addTime || 0,
-            wobble: Math.random() * Math.PI * 2,
-            rotation: (Math.random() - 0.5) * 0.3
+    // قرار دادن شیشه‌های عطر اختصاصی ماهان پرفیوم در مسیر پرش (به‌جای ستاره)
+    if (stepCount % 2 === 0) {
+        perfumesList.push({
+            x: W / 2,
+            y: -98,
+            taken: false,
+            isBlueCap: (stepCount % 4 === 0) // یکی در میان شیشه درب آبی یا درب نقره‌ای
         });
     }
 
-    // تابع اختصاصی رسم شیشه عطر استوانه‌ای ماهان پرفیوم (مطابق عکس ارسالی)
-    function drawMahanBottle(x, y, isBlueCap, angle) {
+    if (score >= 15 && stepCount % 3 === 1) {
+        const gy = -65;
+        const minX = WALL + BALL_R * 2.8;
+        const maxX = W - WALL - BALL_R * 2.8;
+        if (maxX > minX + 24) {
+            for (let attempt = 0; attempt < 10; attempt++) {
+                const gx = minX + Math.random() * (maxX - minX);
+                if (isSafeGreenSpot(gx, gy, 22)) {
+                    greens.push({ x: gx, y: gy, size: 22 });
+                    break;
+                }
+            }
+        }
+    }
+    return 190;
+}
+
+function spawnScatter(x, y, c, count, speed) {
+    for (let i = 0; i < count; i++) {
+        const a = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.25;
+        const v = speed * (0.65 + Math.random() * 0.5);
+        particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, c, r: 2 + Math.random() * 2 });
+    }
+}
+
+function addScorePopup(x, y, txt) {
+    floats.push({ x, y, txt, life: 1 });
+}
+
+function startGame() {
+    const typedName = nameInput.value.trim();
+    if (typedName) {
+        usr.name = typedName;
+        localStorage.setItem("mh_sw_name", typedName);
+    }
+    document.getElementById("start-screen").classList.add("hd");
+    document.getElementById("over-screen").classList.add("hd");
+    document.getElementById("pause-screen").classList.add("hd");
+    document.getElementById("shop-screen").classList.add("hd");
+    score = 0;
+    resetGameState();
+    st = "play";
+    lastT = 0;
+    initAudio();
+    beep(580, .07, "triangle", 0.1);
+    startBGM();
+}
+
+function togglePause() {
+    if (st === "play") {
+        st = "pause";
+        stopBGM();
+        document.getElementById("pause-screen").classList.remove("hd");
+    } else if (st === "pause") {
+        st = "play";
+        lastT = 0;
+        startBGM();
+        document.getElementById("pause-screen").classList.add("hd");
+    }
+}
+
+function openMenu() {
+    st = "menu";
+    stopBGM();
+    resetGameState();
+    document.getElementById("over-screen").classList.add("hd");
+    document.getElementById("pause-screen").classList.add("hd");
+    document.getElementById("shop-screen").classList.add("hd");
+    document.getElementById("start-screen").classList.remove("hd");
+    syncLB(0);
+}
+
+const wrap = document.getElementById("wrap");
+wrap.addEventListener("pointerdown", e => {
+    if (e.target.closest("button") || e.target.closest("input") || e.target.closest("a") || e.target.closest(".overlay") || e.target.closest(".hud-left") || st !== "play") return;
+    side = 1 - side;
+    targetX = side === 0 ? WALL + BALL_R : W - WALL - BALL_R;
+    switching = true;
+    trailStampTimer = 0;
+    trails.push({ x: ballX, y: BALL_Y, r: BALL_R * 0.92, life: 0.85, color: SKINS[curSkin].glow });
+    beep(side === 1 ? 640 : 520, .05, "triangle", 0.1);
+});
+
+function gameOver() {
+    if (st === "over") return;
+    st = "over";
+    stopBGM();
+    shake = 14;
+    beep(135, .3, "sawtooth", 0.14);
+    spawnScatter(ballX, BALL_Y, SKINS[curSkin].glow, 24, 180);
+    if (score > best) {
+        best = score;
+        localStorage.setItem("mh_sw_best", best);
+    }
+    updStars();
+    document.getElementById("end-score").innerText = score;
+    document.getElementById("end-best").innerText = best;
+
+    let wonTier = null;
+    for (let t of CONFIG.tiers) {
+        if (score >= t.minScore) {
+            wonTier = t;
+            break;
+        }
+    }
+    const rewardBox = document.getElementById("reward-box");
+    if (wonTier) {
+        rewardBox.classList.remove("hd");
+        document.getElementById("reward-desc").innerText = wonTier.discountText;
+        document.getElementById("coupon-code").innerText = wonTier.code;
+    } else {
+        rewardBox.classList.add("hd");
+    }
+
+    setTimeout(() => {
+        document.getElementById("over-screen").classList.remove("hd");
+        syncLB(score);
+    }, 480);
+}
+
+function copyCoupon() {
+    const code = document.getElementById("coupon-code").innerText;
+    navigator.clipboard.writeText(code);
+    toast("کد تخفیف " + code + " کپی شد! ✔");
+}
+
+// رسم شیشه عطر استوانه‌ای با لیبل سفید و نشان طلایی m ماهان پرفیوم (به‌جای ستاره)
+function drawMahanPerfumeItem(x, y, isBlueCap, timeNow) {
+    ctx.save();
+    ctx.translate(x, y);
+    // چرخش و شناوری ملایم شیشه در هوا
+    const hoverY = Math.sin(timeNow * 0.006) * 2.5;
+    const tilt = Math.sin(timeNow * 0.004) * 0.12;
+    ctx.translate(0, hoverY);
+    ctx.rotate(tilt);
+
+    const bw = 22;
+    const bh = 32;
+    const capH = 14;
+
+    // هاله نورانی پشت شیشه عطر
+    ctx.shadowColor = isBlueCap ? "#38bdf8" : "#ffd700";
+    ctx.shadowBlur = 14;
+
+    // ۱. بدنه شیشه‌ای عطر
+    const glassGrad = ctx.createLinearGradient(-bw / 2, 0, bw / 2, 0);
+    if (isBlueCap) {
+        glassGrad.addColorStop(0, "#1e1b4b");
+        glassGrad.addColorStop(0.45, "#5b21b6");
+        glassGrad.addColorStop(1, "#0f172a");
+    } else {
+        glassGrad.addColorStop(0, "#18181b");
+        glassGrad.addColorStop(0.45, "#52525b");
+        glassGrad.addColorStop(1, "#09090b");
+    }
+    ctx.fillStyle = glassGrad;
+    ctx.strokeStyle = "rgba(255,255,255,0.6)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-bw / 2, -bh / 2 + 5, bw, bh, 3.5);
+    ctx.fill();
+    ctx.stroke();
+
+    // ۲. درب متالیک نقره‌ای یا آبی رویال
+    const capGrad = ctx.createLinearGradient(-bw / 2, 0, bw / 2, 0);
+    if (isBlueCap) {
+        capGrad.addColorStop(0, "#1e3a8a");
+        capGrad.addColorStop(0.4, "#3b82f6");
+        capGrad.addColorStop(1, "#172554");
+    } else {
+        capGrad.addColorStop(0, "#71717a");
+        capGrad.addColorStop(0.4, "#ffffff");
+        capGrad.addColorStop(1, "#52525b");
+    }
+    ctx.fillStyle = capGrad;
+    ctx.beginPath();
+    ctx.roundRect(-bw / 2, -bh / 2 - capH + 5, bw, capH, [2.5, 2.5, 0, 0]);
+    ctx.fill();
+
+    // ۳. لیبل سفید اختصاصی ماهان پرفیوم روی شیشه
+    ctx.shadowBlur = 0;
+    const lw = bw - 5;
+    const lh = bh - 10;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.roundRect(-lw / 2, -bh / 2 + 9, lw, lh, 1.5);
+    ctx.fill();
+
+    // قوس طلایی بالای m
+    ctx.strokeStyle = "#d4af37";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.arc(0, -bh / 2 + 18, 4.2, Math.PI * 0.9, Math.PI * 2.1);
+    ctx.stroke();
+
+    // حرف m مشکی
+    ctx.fillStyle = "#09090b";
+    ctx.font = "italic 900 10px Georgia";
+    ctx.textAlign = "center";
+    ctx.fillText("m", 0, -bh / 2 + 20.5);
+
+    // متن ریز MAHAN
+    ctx.fillStyle = "#18181b";
+    ctx.font = "bold 3.8px sans-serif";
+    ctx.fillText("MAHAN", 0, -bh / 2 + 25.5);
+
+    ctx.restore();
+}
+
+function drawLuxuryBlock(x, y, w, h) {
+    ctx.save();
+    ctx.shadowColor = "rgba(212,175,55,0.35)";
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = "#d4af37";
+    ctx.fillRect(x, y, w, h);
+
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#121212";
+    ctx.fillRect(x + 2.5, y + 2.5, Math.max(0, w - 5), Math.max(0, h - 5));
+    ctx.restore();
+}
+
+function drawBorderedRect(x, y, w, h, fillCol, strokeCol, lineW) {
+    ctx.fillStyle = fillCol;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = strokeCol;
+    ctx.lineWidth = lineW;
+    ctx.strokeRect(x, y, w, h);
+}
+
+// رسم توپ بازی با لوگوی دایره‌ای واقعی ماهان پرفیوم
+function drawLogoBall(x, y, r, sk) {
+    ctx.save();
+    // هاله نورانی دور لوگو
+    ctx.shadowColor = sk.glow;
+    ctx.shadowBlur = 16;
+
+    ctx.fillStyle = "#000000";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (logoLoaded) {
         ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(angle);
-
-        const bw = 26;
-        const bh = 38;
-        const capH = 18;
-
-        if (isBlueCap) {
-            ctx.shadowColor = "#38bdf8";
-            ctx.shadowBlur = 16;
-        }
-
-        // ۱. بدنه شیشه‌ای استوانه‌ای
-        const glassGrad = ctx.createLinearGradient(-bw/2, 0, bw/2, 0);
-        if (isBlueCap) {
-            glassGrad.addColorStop(0, "#1e1b4b");
-            glassGrad.addColorStop(0.4, "#4c1d95");
-            glassGrad.addColorStop(1, "#0f172a");
-        } else {
-            glassGrad.addColorStop(0, "#18181b");
-            glassGrad.addColorStop(0.4, "#3f3f46");
-            glassGrad.addColorStop(1, "#09090b");
-        }
-        ctx.fillStyle = glassGrad;
-        ctx.strokeStyle = "rgba(255,255,255,0.45)";
-        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.roundRect(-bw/2, -bh/2 + 6, bw, bh, 4);
-        ctx.fill();
-        ctx.stroke();
-
-        // ضخامت شیشه در کف بطری
-        ctx.fillStyle = "rgba(255,255,255,0.28)";
-        ctx.fillRect(-bw/2 + 1, bh/2 + 1, bw - 2, 4);
-
-        // ۲. درب استوانه‌ای متالیک
-        const capGrad = ctx.createLinearGradient(-bw/2, 0, bw/2, 0);
-        if (isBlueCap) {
-            capGrad.addColorStop(0, "#1e3a8a");
-            capGrad.addColorStop(0.35, "#3b82f6");
-            capGrad.addColorStop(0.7, "#1d4ed8");
-            capGrad.addColorStop(1, "#172554");
-        } else {
-            capGrad.addColorStop(0, "#71717a");
-            capGrad.addColorStop(0.35, "#ffffff");
-            capGrad.addColorStop(0.7, "#a1a1aa");
-            capGrad.addColorStop(1, "#52525b");
-        }
-        ctx.fillStyle = capGrad;
-        ctx.beginPath();
-        ctx.roundRect(-bw/2, -bh/2 - capH + 6, bw, capH, [3, 3, 0, 0]);
-        ctx.fill();
-
-        // ۳. لیبل سفید اختصاصی روی شیشه با نشان طلایی و حرف m
-        ctx.shadowBlur = 0;
-        const lw = bw - 6;
-        const lh = bh - 12;
-        ctx.fillStyle = "#f8fafc";
-        ctx.beginPath();
-        ctx.roundRect(-lw/2, -bh/2 + 11, lw, lh, 2);
-        ctx.fill();
-
-        // قوس طلایی بالای m
-        ctx.strokeStyle = "#d4af37";
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(0, -bh/2 + 21, 5, Math.PI * 0.9, Math.PI * 2.1);
-        ctx.stroke();
-
-        // حرف m مشکی وسط لیبل
-        ctx.fillStyle = "#09090b";
-        ctx.font = "italic 900 11px Georgia";
-        ctx.textAlign = "center";
-        ctx.fillText("m", 0, -bh/2 + 24);
-
-        // خط ریز MAHAN زیر حرف m
-        ctx.fillStyle = "#18181b";
-        ctx.font = "bold 4px sans-serif";
-        ctx.fillText("MAHAN", 0, -bh/2 + 30);
-
+        ctx.arc(x, y, r - 1, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(logoImg, x - r, y - r, r * 2, r * 2);
         ctx.restore();
+    } else {
+        // حالت جایگزین تا لحظه لود شدن عکس
+        ctx.fillStyle = "#ffd700";
+        ctx.font = "italic 900 16px Georgia";
+        ctx.textAlign = "center";
+        ctx.fillText("m", x, y + 5);
     }
 
-    function createParticles(x, y, color, count = 14) {
-        for (let i = 0; i < count; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 5 + 2;
-            particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                size: Math.random() * 4 + 2,
-                color: color,
-                alpha: 1
-            });
+    // حلقه طلایی/رنگی دور لوگو
+    ctx.strokeStyle = sk.glow;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function frame(now) {
+    requestAnimationFrame(frame);
+    if (!lastT) { lastT = now; return; }
+    const rawDt = (now - lastT) / 1000;
+    lastT = now;
+    const dt = Math.max(0.002, Math.min(0.032, Number.isFinite(rawDt) ? rawDt : 1 / 60));
+
+    updateBGM();
+    shake *= Math.pow(0.0005, dt);
+
+    ctx.fillStyle = "#0a0a0a";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    if (shake > 0.25) {
+        ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    }
+
+    // دیوارهای طلایی
+    ctx.fillStyle = "#d4af37";
+    ctx.fillRect(0, 0, WALL, H);
+    ctx.fillRect(W - WALL, 0, WALL, H);
+
+    if (st === "menu") {
+        const previewMove = 260 * dt;
+        spawnGap -= previewMove;
+        if (spawnGap <= 0) spawnGap = spawnNextWave();
+        for (let i = bars.length - 1; i >= 0; i--) { bars[i].y += previewMove; if (bars[i].y > H + 60) bars.splice(i, 1); }
+        for (let i = greens.length - 1; i >= 0; i--) { greens[i].y += previewMove; if (greens[i].y > H + 60) greens.splice(i, 1); }
+        for (let i = perfumesList.length - 1; i >= 0; i--) { perfumesList[i].y += previewMove; if (perfumesList[i].y > H + 60) perfumesList.splice(i, 1); }
+        if (Math.sin(now * 0.0022) > 0.88 && !switching) {
+            side = 1 - side;
+            targetX = side === 0 ? WALL + BALL_R : W - WALL - BALL_R;
+            switching = true;
+            trailStampTimer = 0;
+            trails.push({ x: ballX, y: BALL_Y, r: BALL_R * 0.92, life: 0.85, color: SKINS[curSkin].glow });
         }
     }
 
-    function shakeScreen() {
-        container.style.transform = "translate(6px, -6px)";
-        setTimeout(() => { container.style.transform = "translate(-6px, 6px)"; }, 50);
-        setTimeout(() => { container.style.transform = "translate(4px, 4px)"; }, 100);
-        setTimeout(() => { container.style.transform = "translate(0, 0)"; }, 150);
-    }
-
-    function updateCombo(reset = false) {
-        const badge = document.getElementById('combo-badge');
-        if (reset) {
-            comboCount = 0;
-            isFever = false;
-            badge.classList.remove('active');
-            return;
-        }
-        comboCount++;
-        if (comboCount >= 5) {
-            isFever = true;
-            badge.innerText = `🔥 تب طلایی! امتیاز ×۲ (کمبو ${comboCount})`;
-            badge.classList.add('active');
-        }
-    }
-
-    function startGame() {
-        score = 0;
-        timeLeft = CONFIG.gameDuration;
-        items = [];
-        particles = [];
-        floatingTexts = [];
-        updateCombo(true);
-
-        player.x = width / 2 - player.w / 2;
-        player.targetX = player.x;
-        player.y = height - 100;
-
-        const timeEl = document.getElementById('time-display');
-        timeEl.classList.remove('danger-time');
-        timeEl.innerText = timeLeft;
-        document.getElementById('score-display').innerText = score;
-
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('end-screen').classList.add('hidden');
-
-        gameRunning = true;
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            timeEl.innerText = timeLeft;
-            if (timeLeft <= 5 && timeLeft > 0) {
-                timeEl.classList.add('danger-time');
+    if (st === "play" || st === "menu") {
+        const switchSpeed = 1380 * dt;
+        if (Math.abs(targetX - ballX) <= switchSpeed) {
+            if (switching) {
+                switching = false;
+                if (st === "play") {
+                    shake = 4.5;
+                    beep(250, .035, "sine", 0.07);
+                }
+                const edgeX = side === 0 ? WALL + 2 : W - WALL - 2;
+                for (let i = 0; i < 8; i++) {
+                    particles.push({
+                        x: edgeX,
+                        y: BALL_Y + (Math.random() - 0.5) * 12,
+                        vx: (side === 0 ? 1 : -1) * (30 + Math.random() * 75),
+                        vy: (Math.random() - 0.5) * 90,
+                        life: 0.65,
+                        c: "#ffd700",
+                        r: 1.8 + Math.random() * 1.8
+                    });
+                }
             }
-            if (timeLeft <= 0) {
-                endGame();
+            ballX = targetX;
+        } else {
+            ballX += Math.sign(targetX - ballX) * switchSpeed;
+            trailStampTimer += dt;
+            if (trailStampTimer >= 0.015) {
+                trailStampTimer = 0;
+                trails.push({ x: ballX, y: BALL_Y, r: BALL_R * 0.88, life: 0.8, color: SKINS[curSkin].glow });
             }
-        }, 1000);
-
-        requestAnimationFrame(gameLoop);
-    }
-
-    function endGame() {
-        gameRunning = false;
-        clearInterval(timerInterval);
-
-        if (score > bestScore) {
-            bestScore = score;
-            localStorage.setItem('mahan_best_score', bestScore);
-            document.getElementById('best-display').innerText = bestScore;
         }
 
-        document.getElementById('final-score').innerText = score;
-        document.getElementById('end-best-score').innerText = bestScore;
+        if (!switching) {
+            dustTimer += dt;
+            if (dustTimer > 0.025) {
+                dustTimer = 0;
+                const wx = side === 0 ? WALL + 2 : W - WALL - 2;
+                particles.push({
+                    x: wx + (side === 0 ? Math.random() * 4 : -Math.random() * 4),
+                    y: BALL_Y + BALL_R * 0.6,
+                    vx: (side === 0 ? 1 : -1) * (8 + Math.random() * 28),
+                    vy: 85 + Math.random() * 85,
+                    life: 0.7,
+                    c: "#f3e5ab",
+                    r: 1.6 + Math.random() * 1.8
+                });
+            }
+        }
+    }
 
-        let wonTier = null;
-        for (let tier of CONFIG.tiers) {
-            if (score >= tier.minScore) {
-                wonTier = tier;
+    if (st === "play") {
+        const fallSpeed = getFallSpeed(score);
+        const dyStep = fallSpeed * dt;
+        spawnGap -= dyStep;
+        if (spawnGap <= 0) spawnGap = spawnNextWave();
+
+        for (let i = bars.length - 1; i >= 0; i--) {
+            const b = bars[i];
+            b.y += dyStep;
+            const nx = Math.max(b.x, Math.min(ballX, b.x + b.w));
+            const ny = Math.max(b.y, Math.min(BALL_Y, b.y + b.h));
+            const dx = ballX - nx, dy = BALL_Y - ny;
+            if (dx * dx + dy * dy < (BALL_R - 2.5) * (BALL_R - 2.5)) {
+                gameOver();
                 break;
             }
+            if (!b.passed && b.y > BALL_Y + BALL_R) {
+                b.passed = true;
+                score++;
+                document.getElementById("hud-best").innerText = Math.max(best, score);
+            }
+            if (b.y > H + 60) bars.splice(i, 1);
         }
 
-        const rewardSection = document.getElementById('reward-section');
-        if (wonTier) {
-            rewardSection.classList.remove('hidden');
-            document.getElementById('end-title').innerText = "تبریک! برنده شدید";
-            document.getElementById('reward-desc').innerText = wonTier.discountText;
-            document.getElementById('coupon-text').innerText = wonTier.code;
-            playSound('bonus');
-        } else {
-            rewardSection.classList.add('hidden');
-            document.getElementById('end-title').innerText = "کمی بیشتر تلاش کن!";
+        for (let i = greens.length - 1; i >= 0; i--) {
+            const g = greens[i];
+            g.y += dyStep;
+            const half = g.size / 2;
+            const nx = Math.max(g.x - half, Math.min(ballX, g.x + half));
+            const ny = Math.max(g.y - half, Math.min(BALL_Y, g.y + half));
+            const dx = ballX - nx, dy = BALL_Y - ny;
+            if (dx * dx + dy * dy < (BALL_R - 2) * (BALL_R - 2)) {
+                gameOver();
+                break;
+            }
+            if (g.y > H + 60) greens.splice(i, 1);
         }
 
-        document.getElementById('end-screen').classList.remove('hidden');
+        // برخورد لوگوی ماهان پرفیوم با شیشه‌های عطر در مسیر
+        for (let i = perfumesList.length - 1; i >= 0; i--) {
+            const p = perfumesList[i];
+            p.y += dyStep;
+            if (!p.taken) {
+                const dx = ballX - p.x, dy = BALL_Y - p.y;
+                if (dx * dx + dy * dy < (BALL_R + 18) * (BALL_R + 18)) {
+                    p.taken = true;
+                    stars++;
+                    updStars();
+                    score += 1;
+                    document.getElementById("hud-best").innerText = Math.max(best, score);
+                    beep(920, .09, "sine", 0.12);
+                    spawnScatter(p.x, p.y, p.isBlueCap ? "#38bdf8" : "#ffd700", 12, 110);
+                    addScorePopup(p.x, p.y - 10, "+1 🧴");
+                }
+            }
+            if (p.y > H + 60) perfumesList.splice(i, 1);
+        }
     }
 
-    function copyCoupon() {
-        const code = document.getElementById('coupon-text').innerText;
-        navigator.clipboard.writeText(code);
-        const btn = document.querySelector('.copy-btn');
-        btn.innerText = "کپی شد! ✔";
-        setTimeout(() => { btn.innerText = "کپی کردن کد تخفیف"; }, 2000);
+    if (st === "play") {
+        ctx.fillStyle = "rgba(255,215,0,0.85)";
+        ctx.font = "900 44px Vazirmatn, Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(String(score), W / 2, 112);
     }
 
-    function drawBasket() {
-        player.x += (player.targetX - player.x) * 0.35;
+    for (let i = 0; i < bars.length; i++) {
+        const b = bars[i];
+        drawLuxuryBlock(b.x, b.y, b.w, b.h);
+    }
 
+    for (let i = 0; i < greens.length; i++) {
+        const g = greens[i], half = g.size / 2;
+        drawBorderedRect(g.x - half, g.y - half, g.size, g.size, "#18181b", "#ef4444", 3);
+    }
+
+    // نمایش شیشه‌های عطر ماهان پرفیوم در مسیر بازی
+    for (let i = 0; i < perfumesList.length; i++) {
+        if (!perfumesList[i].taken) {
+            drawMahanPerfumeItem(perfumesList[i].x, perfumesList[i].y, perfumesList[i].isBlueCap, now);
+        }
+    }
+
+    for (let i = trails.length - 1; i >= 0; i--) {
+        const tr = trails[i];
+        tr.life -= 4.6 * dt;
+        if (tr.life <= 0) { trails.splice(i, 1); continue; }
         ctx.save();
-        if (isFever) {
-            ctx.shadowColor = "#ffd700";
-            ctx.shadowBlur = 25;
-        }
-
-        // بدنه کیسه خرید مشکی-طلایی
-        const grad = ctx.createLinearGradient(player.x, player.y, player.x, player.y + player.h);
-        grad.addColorStop(0, isFever ? "#3d2e05" : "#181818");
-        grad.addColorStop(1, "#050505");
-
-        ctx.fillStyle = grad;
-        ctx.strokeStyle = isFever ? "#fff066" : "#d4af37";
-        ctx.lineWidth = isFever ? 3.5 : 2.5;
-
+        ctx.globalAlpha = Math.max(0, Math.min(1, tr.life * 0.42));
+        ctx.fillStyle = tr.color;
         ctx.beginPath();
-        ctx.roundRect(player.x, player.y, player.w, player.h, 14);
+        ctx.arc(tr.x, tr.y, Math.max(2, tr.r * tr.life), 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
-
-        // دسته کیسه
-        ctx.beginPath();
-        ctx.arc(player.x + player.w / 2, player.y, 16, Math.PI, 0);
-        ctx.stroke();
-
-        // نمایش لوگوی دایره‌ای واقعی ماهان پرفیوم وسط سبد
-        ctx.shadowBlur = 0;
-        if (logoLoaded) {
-            const r = 24;
-            const cx = player.x + player.w / 2;
-            const cy = player.y + player.h / 2;
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.clip();
-            ctx.drawImage(logoImg, cx - r, cy - r, r * 2, r * 2);
-            ctx.restore();
-
-            ctx.strokeStyle = "#ffd700";
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.stroke();
-        } else {
-            ctx.fillStyle = "#ffd700";
-            ctx.font = "900 13px Vazirmatn";
-            ctx.textAlign = "center";
-            ctx.fillText("MAHAN", player.x + player.w / 2, player.y + 30);
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "400 9px Vazirmatn";
-            ctx.fillText("PERFUME", player.x + player.w / 2, player.y + 44);
-        }
-
         ctx.restore();
     }
 
-    function gameLoop() {
-        if (!gameRunning) return;
-
-        ctx.clearRect(0, 0, width, height);
-
-        const spawnRate = timeLeft <= 8 ? 18 : 25;
-        spawnTimer++;
-        if (spawnTimer > spawnRate) {
-            spawnItem();
-            spawnTimer = 0;
-        }
-
-        drawBasket();
-
-        for (let i = items.length - 1; i >= 0; i--) {
-            let it = items[i];
-            it.y += it.speed;
-            it.wobble += 0.07;
-            const drawX = it.x + Math.sin(it.wobble) * 5;
-            const tilt = Math.sin(it.wobble) * 0.15;
-
-            if (it.type === 'silver_bottle') {
-                drawMahanBottle(drawX, it.y, false, tilt);
-            } else if (it.type === 'blue_bottle') {
-                drawMahanBottle(drawX, it.y, true, tilt);
-            } else if (it.type === 'time') {
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(drawX, it.y - 10, 20, 0, Math.PI * 2);
-                ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
-                ctx.fill();
-                ctx.font = "34px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText("⏳", drawX, it.y);
-                ctx.restore();
-            } else if (it.type === 'bomb') {
-                ctx.font = "36px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText("💣", drawX, it.y);
-            }
-
-            // برخورد با سبد
-            if (
-                it.y + 14 >= player.y &&
-                it.y - 22 <= player.y + player.h &&
-                drawX >= player.x - 12 &&
-                drawX <= player.x + player.w + 12
-            ) {
-                if (it.type === 'bomb') {
-                    score = Math.max(0, score + it.points);
-                    updateCombo(true);
-                    playSound('bomb');
-                    shakeScreen();
-                    createParticles(drawX, player.y, "#ef4444", 20);
-                    floatingTexts.push({ x: drawX, y: player.y - 10, text: "-25 💣", color: "#ff4d4d", alpha: 1 });
-                } else {
-                    updateCombo(false);
-                    const multiplier = isFever ? 2 : 1;
-                    const gained = it.points * multiplier;
-                    score += gained;
-
-                    if (it.addTime > 0) {
-                        timeLeft += it.addTime;
-                        document.getElementById('time-display').innerText = timeLeft;
-                        playSound('bonus');
-                        createParticles(drawX, player.y, "#38bdf8", 16);
-                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${it.addTime} ثانیه!`, color: "#38bdf8", alpha: 1 });
-                    } else if (it.type === 'blue_bottle') {
-                        playSound('bonus');
-                        createParticles(drawX, player.y, "#60a5fa", 20);
-                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained} 💙`, color: "#93c5fd", alpha: 1 });
-                    } else {
-                        playSound('catch', comboCount);
-                        createParticles(drawX, player.y, "#ffd700", 12);
-                        floatingTexts.push({ x: drawX, y: player.y - 10, text: `+${gained}`, color: "#4ade80", alpha: 1 });
-                    }
-                }
-
-                document.getElementById('score-display').innerText = score;
-                items.splice(i, 1);
-                continue;
-            }
-
-            if (it.y > height + 40) {
-                if (it.type === 'silver_bottle' || it.type === 'blue_bottle') {
-                    updateCombo(true);
-                }
-                items.splice(i, 1);
-            }
-        }
-
-        // ذرات درخشان
-        for (let i = particles.length - 1; i >= 0; i--) {
-            let p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.alpha -= 0.035;
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, p.alpha);
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-            if (p.alpha <= 0) particles.splice(i, 1);
-        }
-
-        // متن‌های امتیاز شناور
-        for (let i = floatingTexts.length - 1; i >= 0; i--) {
-            let ft = floatingTexts[i];
-            ft.y -= 1.8;
-            ft.alpha -= 0.025;
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, ft.alpha);
-            ctx.fillStyle = ft.color;
-            ctx.font = "900 18px Vazirmatn";
-            ctx.textAlign = "center";
-            ctx.fillText(ft.text, ft.x, ft.y);
-            ctx.restore();
-            if (ft.alpha <= 0) floatingTexts.splice(i, 1);
-        }
-
-        requestAnimationFrame(gameLoop);
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= 2.0 * dt;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+        ctx.fillStyle = p.c;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
     }
+
+    const sk = SKINS[curSkin];
+    if (st !== "over") {
+        drawLogoBall(ballX, BALL_Y, BALL_R, sk);
+    }
+
+    for (let i = floats.length - 1; i >= 0; i--) {
+        const f = floats[i];
+        f.y -= 48 * dt;
+        f.life -= 1.6 * dt;
+        if (f.life <= 0) { floats.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, Math.min(1, f.life));
+        ctx.fillStyle = "#ffd700";
+        ctx.font = "700 16px Vazirmatn, Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(f.txt, f.x, f.y);
+        ctx.restore();
+    }
+
+    ctx.restore();
+}
+
+syncLB(0);
+requestAnimationFrame(frame);
+
+function shareScore() {
+    const txt = `⚡ رکورد من در چالش ماهان پرفیوم شد: ${best} امتیاز!\nمی‌تونی با سرعت عملت رکوردم رو بزنی و کد تخفیف بگیری؟ 👇\n${CONFIG.gameUrl}\nپیج: ${CONFIG.instagramHandle}`;
+    if (navigator.share) {
+        navigator.share({ title: "SWITCH | ماهان پرفیوم", text: txt, url: CONFIG.gameUrl }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(txt);
+        toast("متن کل‌کل و لینک بازی کپی شد! برای دوستات بفرست ✔");
+    }
+}
 </script>
 </body>
 </html>
